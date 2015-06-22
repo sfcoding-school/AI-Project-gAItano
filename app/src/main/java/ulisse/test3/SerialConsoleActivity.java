@@ -67,6 +67,10 @@ public class SerialConsoleActivity extends Activity {
     private TextView mDumpTextView;
     private ScrollView mScrollView;
     private Button button;
+    private Button button2;
+    private Button button3;
+    private Button button4;
+    private Button button5;
     private boolean serialOk = false;
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -101,6 +105,10 @@ public class SerialConsoleActivity extends Activity {
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
         button = (Button) findViewById(R.id.button);
+        button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
+        button4 = (Button) findViewById(R.id.button4);
+        button5 = (Button) findViewById(R.id.button5);
 
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -122,6 +130,122 @@ public class SerialConsoleActivity extends Activity {
                         // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
 
                         sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
+                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        /*
+                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                        Header Byte = 0x7e
+                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                        Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                         */
+                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+                        // dice che effettivamente 2b equivale a "+"
+                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
+                        sPort.write(hexStringToByteArray("0x7e017788"), 200);
+                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button3.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        /*
+                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                        Header Byte = 0x7e
+                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                        Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                         */
+                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+                        // dice che effettivamente 2b equivale a "+"
+                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
+                        sPort.write(hexStringToByteArray("0x7e01738c"), 200);
+                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        /*
+                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                        Header Byte = 0x7e
+                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                        Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                         */
+                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+                        // dice che effettivamente 2b equivale a "+"
+                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
+                        sPort.write(hexStringToByteArray("0x7e01718e"), 200);
+                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button5.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        /*
+                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                        Header Byte = 0x7e
+                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                        Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                         */
+                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+                        // dice che effettivamente 2b equivale a "+"
+                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
+                        sPort.write(hexStringToByteArray("0x7e01649b"), 200);
                         Log.e(TAG, "sembra aver funzionato, invio dati");
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");

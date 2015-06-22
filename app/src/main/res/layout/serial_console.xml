@@ -3,40 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/demoTitle"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:text="app_title"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button" />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/demoTitle"
-        android:layout_height="1dip"
-        android:background="#eeeeee" />
-
-    <ScrollView
-        android:id="@+id/demoScroller"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/separator" >
+        android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/consoleText"
-            android:textIsSelectable="true"
+            android:id="@+id/demoTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:typeface="monospace" />
-    </ScrollView>
+            android:layout_alignParentTop="true"
+            android:text="app_title"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="wakeUP"
+            android:id="@+id/button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Forward"
+            android:id="@+id/button2" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Backward"
+            android:id="@+id/button3" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Left"
+            android:id="@+id/button4" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Right"
+            android:id="@+id/button5" />
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/demoTitle"
+            android:layout_height="1dip"
+            android:background="#eeeeee" />
+
+        <ScrollView
+            android:id="@+id/demoScroller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/separator" >
+
+            <TextView
+                android:id="@+id/consoleText"
+                android:textIsSelectable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:typeface="monospace" />
+        </ScrollView>
+    </LinearLayout>
 
 </RelativeLayout>
