@@ -19,7 +19,8 @@ import java.util.Map;
 
 public class MovementHex {
 
-    Map<String, String> map = new HashMap<String, String>(){{
+    private Map<String, String> map = new HashMap<String, String>(){{
+        //SIM CONTROL
         put("wakeUP","0x7e012bd4");
         put("powerOFF","0x7e012dd2");
         put("Forward","0x7e017788");
@@ -29,15 +30,16 @@ public class MovementHex {
         put("stop","0x7e0120df");
         put("crabLeft","0x7e01718e");
         put("crabRight","0x7e01659a");
+        //PIP CONTROL
         put("headUP","0x7e0348007f38");
         put("headDown","0x7e03480000b7");
     }};
 
     public byte[] returnCommand(String command){
-        return hexStringToByteArray(map.get("wakeUP"));
+        return hexStringToByteArray(map.get(command));
     }
 
-    public static byte[] hexStringToByteArray(String s) {
+    private static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {

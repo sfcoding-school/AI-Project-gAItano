@@ -49,8 +49,7 @@ public class Movement extends MovementHex {
                 sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
                 serialOk = true;
             } catch (IOException e) {
-                Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
-                Log.d(TAG, "onResume: Error opening device: " + e.getMessage());
+                Log.e(TAG, "onResume: Error opening device: " + e.getMessage());
                 serialOk = false;
                 try {
                     sPort.close();
@@ -103,7 +102,7 @@ public class Movement extends MovementHex {
     public void executeCommand(String comando){
         if (serialOk) {
             try {
-                sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
+                sPort.write(returnCommand(comando), 200);
             } catch (IOException e) {
                 Log.e(TAG, "Error IOex, invio dati");
             }
