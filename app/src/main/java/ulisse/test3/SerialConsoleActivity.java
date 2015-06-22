@@ -21,17 +21,10 @@ package ulisse.test3;
  * Project home page: https://github.com/mik3y/usb-serial-for-android
  */
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -39,8 +32,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.util.HexDump;
-import com.hoho.android.usbserial.util.SerialInputOutputManager;
+
+import ulisse.test3.MovementLibrary.Movement;
 
 /*
                       [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
@@ -141,22 +134,15 @@ public class SerialConsoleActivity extends Activity {
         b_test = (Button) findViewById(R.id.button8);
         b_powerOFF = (Button) findViewById(R.id.button);
 
-       /* button_wakeUP.setOnClickListener(new View.OnClickListener() {
+       button_wakeUP.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                if (serialOk) {
-                    try {
-
-                        sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error IOex, invio dati");
-                    }
-                }
+                test.executeCommand("wakeUP");
             }
 
         });
-
+/*
         b_powerOFF.setOnClickListener(new View.OnClickListener() {
 
             @Override

@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.test3.MovementLibrary;
 
 import android.content.Context;
 import android.hardware.usb.UsbDeviceConnection;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Movement {
+public class Movement extends MovementHex {
 
     private final String TAG = "MovementClass";
 
@@ -98,14 +98,17 @@ public class Movement {
         startIoManager();
     }
 
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
+
+
+    public void executeCommand(String comando){
+        if (serialOk) {
+            try {
+                sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
+            } catch (IOException e) {
+                Log.e(TAG, "Error IOex, invio dati");
+            }
         }
-        return data;
+
     }
 
 }
