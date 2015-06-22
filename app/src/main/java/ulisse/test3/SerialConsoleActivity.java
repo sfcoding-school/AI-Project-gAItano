@@ -272,7 +272,7 @@ public class SerialConsoleActivity extends Activity {
             public void onClick(View arg0) {
                 if (serialOk){
                     try {
-                        if (headTest == false) {
+                        if (!headTest) {
                             sPort.write(hexStringToByteArray("0x7e0348007f38"), 200);
                             headTest = true;
                         } else{
