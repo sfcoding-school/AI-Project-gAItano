@@ -69,7 +69,7 @@ public class SerialConsoleActivity extends Activity {
      * can get away with it because both activities will run in the same
      * process, and this is a simple demo.
      */
-    private static UsbSerialPort sPort = null;
+
 
     private TextView mDumpTextView;
     private ScrollView mScrollView;
@@ -84,14 +84,12 @@ public class SerialConsoleActivity extends Activity {
     private Button b_test;
     private Button b_powerOFF;
 
+    private static UsbSerialPort sPort = null;
+    Movement test;
+
     private boolean headTest = false;
 
-    private boolean serialOk = false;
-
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
-
-    private SerialInputOutputManager mSerialIoManager;
-
+/*
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
 
@@ -111,13 +109,25 @@ public class SerialConsoleActivity extends Activity {
                 }
             };
 
+    private void updateReceivedData(byte[] data) {
+        final String message = "Read " + data.length + " bytes: \n"
+                + HexDump.dumpHexString(data) + "\n\n";
+        mDumpTextView.append(message);
+        mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+    }*/
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.serial_console);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+
+        test = new Movement(getApplicationContext(), sPort);
 
         button_wakeUP = (Button) findViewById(R.id.button9);
         button_moveForward = (Button) findViewById(R.id.button2);
@@ -131,12 +141,13 @@ public class SerialConsoleActivity extends Activity {
         b_test = (Button) findViewById(R.id.button8);
         b_powerOFF = (Button) findViewById(R.id.button);
 
-        button_wakeUP.setOnClickListener(new View.OnClickListener() {
+       /* button_wakeUP.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (serialOk) {
                     try {
+
                         sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
@@ -285,99 +296,21 @@ public class SerialConsoleActivity extends Activity {
                 }
             }
 
-        });
+        });*/
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopIoManager();
-        if (sPort != null) {
-            try {
-                sPort.close();
-            } catch (IOException e) {
-                // Ignore.
-            }
-            sPort = null;
-        }
+        test.pauseActivity();
         finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "Resumed, port=" + sPort);
-        if (sPort == null) {
-            Log.d(TAG, "onResume: sPort is Null");
-        } else {
-            final UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-
-            UsbDeviceConnection connection = usbManager.openDevice(sPort.getDriver().getDevice());
-            Log.d(TAG, "Resumed, port=" + sPort.getDriver());
-            Log.d(TAG, "Resumed, port=" + sPort.getDriver().getDevice());
-            if (connection == null) {
-                Log.d(TAG, "onResume: Opening device failed");
-                return;
-            }
-
-            try {
-                sPort.open(connection);
-                sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-                serialOk = true;
-            } catch (IOException e) {
-                Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
-                Log.d(TAG, "onResume: Error opening device: " + e.getMessage());
-                serialOk = false;
-                try {
-                    sPort.close();
-                } catch (IOException e2) {
-                    // Ignore.
-                }
-                sPort = null;
-                return;
-            }
-            Log.d(TAG, "onResume: Serial device: " + sPort.getClass().getSimpleName());
-        }
-        onDeviceStateChange();
-    }
-
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
-    }
-
-    private void stopIoManager() {
-        if (mSerialIoManager != null) {
-            Log.i(TAG, "Stopping io manager ..");
-            mSerialIoManager.stop();
-            mSerialIoManager = null;
-        }
-    }
-
-    private void startIoManager() {
-        if (sPort != null) {
-            Log.i(TAG, "Starting io manager ..");
-            mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
-            mExecutor.submit(mSerialIoManager);
-        }
-    }
-
-    private void onDeviceStateChange() {
-        stopIoManager();
-        startIoManager();
-    }
-
-    private void updateReceivedData(byte[] data) {
-        final String message = "Read " + data.length + " bytes: \n"
-                + HexDump.dumpHexString(data) + "\n\n";
-        mDumpTextView.append(message);
-        mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+        test.init_connection();
     }
 
     static void show(Context context, UsbSerialPort port) {
