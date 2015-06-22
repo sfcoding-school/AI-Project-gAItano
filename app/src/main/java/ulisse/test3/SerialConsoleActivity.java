@@ -32,16 +32,14 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.util.HexDump;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Monitors a single {@link UsbSerialPort} instance, showing all data
@@ -68,6 +66,8 @@ public class SerialConsoleActivity extends Activity {
     private TextView mTitleTextView;
     private TextView mDumpTextView;
     private ScrollView mScrollView;
+    private Button button;
+    private boolean serialOk = false;
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
@@ -99,6 +99,38 @@ public class SerialConsoleActivity extends Activity {
         mTitleTextView = (TextView) findViewById(R.id.demoTitle);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+
+        button = (Button) findViewById(R.id.button);
+
+        button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        /*
+                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                        Header Byte = 0x7e
+                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                        Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                         */
+                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+                        // dice che effettivamente 2b equivale a "+"
+                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
+                        sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
+                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
     }
 
     @Override
@@ -136,9 +168,11 @@ public class SerialConsoleActivity extends Activity {
             try {
                 sPort.open(connection);
                 sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                serialOk = true;
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 mTitleTextView.setText("Error opening device: " + e.getMessage());
+                serialOk = false;
                 try {
                     sPort.close();
                 } catch (IOException e2) {
@@ -149,12 +183,6 @@ public class SerialConsoleActivity extends Activity {
             }
             mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
 
-            try {
-                sPort.write(hexStringToByteArray("0xFF"), 0);
-                Log.e(TAG, "sembra aver funzionato, invio dati");
-            } catch (IOException e) {
-                Log.e(TAG, "Error IOex, invio dati");
-            }
 
         }
         onDeviceStateChange();
