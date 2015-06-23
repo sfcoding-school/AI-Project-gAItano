@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-
+                showTicTacToe();
             }
 
         });
@@ -123,4 +123,10 @@ public class MainActivity extends Activity {
        if (port != null)
             SerialConsoleActivity.show(this, port);
     }
+
+    private void showTicTacToe() {
+        if (port != null)
+            TicTacToe.show(this, port);
+    }
+
 }
