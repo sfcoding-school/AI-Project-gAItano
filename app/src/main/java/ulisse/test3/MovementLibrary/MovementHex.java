@@ -49,7 +49,7 @@ public class MovementHex {
         put("headDown","0x7e03480000b7");
         put("headLeft","0x7e03486e0049");
 
-        //inclina il corpo di 118
+        //inclina il corpo di 118 (parte davanti verso l'alto)
         put("test","0x7e074276000000000047");
     }};
 

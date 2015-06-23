@@ -46,6 +46,16 @@ public class MainActivity extends Activity {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         Button button_movement = (Button) findViewById(R.id.b_movement);
         Button button_TicTacToe = (Button) findViewById(R.id.b_project);
+        Button button_gioca = (Button) findViewById(R.id.button12);
+
+        button_gioca.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                showGiocaActivity();
+            }
+
+        });
 
         button_movement.setOnClickListener(new View.OnClickListener() {
 
@@ -65,6 +75,10 @@ public class MainActivity extends Activity {
 
         });
 
+    }
+
+    private void showGiocaActivity() {
+        GiocaActivity.show(this);
     }
 
     private void refreshDeviceList() {
