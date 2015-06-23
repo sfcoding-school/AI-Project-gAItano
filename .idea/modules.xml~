@@ -3,9 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-
+<<<<<<< HEAD
+      <module fileurl="file://$PROJECT_DIR$/gAitano.iml" filepath="$PROJECT_DIR$/gAitano.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usbSerialExamples/usbSerialExamples.iml" filepath="$PROJECT_DIR$/usbSerialExamples/usbSerialExamples.iml" />
+=======
       <module fileurl="file://$PROJECT_DIR$/gaitanoTicTacToe.iml" filepath="$PROJECT_DIR$/gaitanoTicTacToe.iml" />
-
+>>>>>>> 1863847a5d9a548d748362c99e32f6a15d1fdab2
       <module fileurl="file://$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" filepath="$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" />
     </modules>
   </component>

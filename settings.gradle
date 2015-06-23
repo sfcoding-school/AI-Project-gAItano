@@ -1,1 +1,1 @@
-include ':app', 'usbSerialForAndroid', 'usbSerialExamples'
+include ':app', 'usbSerialForAndroid'

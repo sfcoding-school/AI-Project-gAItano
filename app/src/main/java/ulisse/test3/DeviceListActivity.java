@@ -142,9 +142,6 @@ public class DeviceListActivity extends Activity {
             }
         });
 
-
-        Log.e("TESTBYTE", String.valueOf("0xff".getBytes()) + " || " + String.valueOf("0xff".getBytes()[0]) + " || " + String.valueOf("0xff".getBytes()[1]) );
-
     }
 
     @Override
