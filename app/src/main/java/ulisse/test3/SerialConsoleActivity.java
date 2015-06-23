@@ -33,6 +33,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -41,12 +42,19 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.util.HexDump;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
-/**
- * Monitors a single {@link UsbSerialPort} instance, showing all data
- * received.
- *
- * @author mike wakerly (opensource@hoho.com)
- */
+/*
+                      [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
+                      Header Byte = 0x7e
+                      Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
+                      Check Sum = 0xff – (8 bit sum of all data bytes)
+
+                       */
+// questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
+// basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
+// dice che effettivamente 2b equivale a "+"
+// per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
+// per fare questi conti http://www.miniwebtool.com/hex-calculatornew
+
 public class SerialConsoleActivity extends Activity {
 
     private final String TAG = "aaaaaa";
@@ -63,14 +71,21 @@ public class SerialConsoleActivity extends Activity {
      */
     private static UsbSerialPort sPort = null;
 
-    private TextView mTitleTextView;
     private TextView mDumpTextView;
     private ScrollView mScrollView;
-    private Button button;
-    private Button button2;
-    private Button button3;
-    private Button button4;
-    private Button button5;
+    private Button button_wakeUP;
+    private Button button_moveForward;
+    private Button button_moveBackward;
+    private Button button_rotateLeft;
+    private Button button_rotateRight;
+    private Button button_stop;
+    private Button b_crabLeft;
+    private Button b_crabRight;
+    private Button b_test;
+    private Button b_powerOFF;
+
+    private boolean headTest = false;
+
     private boolean serialOk = false;
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -100,37 +115,29 @@ public class SerialConsoleActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.serial_console);
-        mTitleTextView = (TextView) findViewById(R.id.demoTitle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
-        button = (Button) findViewById(R.id.button);
-        button2 = (Button) findViewById(R.id.button2);
-        button3 = (Button) findViewById(R.id.button3);
-        button4 = (Button) findViewById(R.id.button4);
-        button5 = (Button) findViewById(R.id.button5);
+        button_wakeUP = (Button) findViewById(R.id.button9);
+        button_moveForward = (Button) findViewById(R.id.button2);
+        button_moveBackward = (Button) findViewById(R.id.button3);
+        button_rotateLeft = (Button) findViewById(R.id.button4);
+        button_rotateRight = (Button) findViewById(R.id.button5);
+        button_stop = (Button) findViewById(R.id.b_emergencyStop);
+        b_crabLeft = (Button) findViewById(R.id.button6);
+        b_crabRight = (Button) findViewById(R.id.button7);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        b_test = (Button) findViewById(R.id.button8);
+        b_powerOFF = (Button) findViewById(R.id.button);
+
+        button_wakeUP.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                if (serialOk){
+                if (serialOk) {
                     try {
-                        /*
-                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
-                        Header Byte = 0x7e
-                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
-                        Check Sum = 0xff – (8 bit sum of all data bytes)
-
-                         */
-                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
-                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
-                        // dice che effettivamente 2b equivale a "+"
-                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
-                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
-
                         sPort.write(hexStringToByteArray("0x7e012bd4"), 200);
-                        Log.e(TAG, "sembra aver funzionato, invio dati");
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
                     }
@@ -139,27 +146,28 @@ public class SerialConsoleActivity extends Activity {
 
         });
 
-        button2.setOnClickListener(new View.OnClickListener() {
+        b_powerOFF.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk) {
+                    try {
+                        sPort.write(hexStringToByteArray("0x7e012dd2"), 200);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button_moveForward.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (serialOk){
                     try {
-                        /*
-                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
-                        Header Byte = 0x7e
-                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
-                        Check Sum = 0xff – (8 bit sum of all data bytes)
-
-                         */
-                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
-                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
-                        // dice che effettivamente 2b equivale a "+"
-                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
-                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
-
                         sPort.write(hexStringToByteArray("0x7e017788"), 200);
-                        Log.e(TAG, "sembra aver funzionato, invio dati");
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
                     }
@@ -168,27 +176,13 @@ public class SerialConsoleActivity extends Activity {
 
         });
 
-        button3.setOnClickListener(new View.OnClickListener() {
+        button_moveBackward.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (serialOk){
                     try {
-                        /*
-                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
-                        Header Byte = 0x7e
-                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
-                        Check Sum = 0xff – (8 bit sum of all data bytes)
-
-                         */
-                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
-                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
-                        // dice che effettivamente 2b equivale a "+"
-                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
-                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
-
                         sPort.write(hexStringToByteArray("0x7e01738c"), 200);
-                        Log.e(TAG, "sembra aver funzionato, invio dati");
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
                     }
@@ -197,27 +191,13 @@ public class SerialConsoleActivity extends Activity {
 
         });
 
-        button4.setOnClickListener(new View.OnClickListener() {
+        button_rotateLeft.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (serialOk){
                     try {
-                        /*
-                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
-                        Header Byte = 0x7e
-                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
-                        Check Sum = 0xff – (8 bit sum of all data bytes)
-
-                         */
-                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
-                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
-                        // dice che effettivamente 2b equivale a "+"
-                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
-                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
-
-                        sPort.write(hexStringToByteArray("0x7e01718e"), 200);
-                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                        sPort.write(hexStringToByteArray("0x7e01619e"), 200);
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
                     }
@@ -226,27 +206,79 @@ public class SerialConsoleActivity extends Activity {
 
         });
 
-        button5.setOnClickListener(new View.OnClickListener() {
+        button_rotateRight.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (serialOk){
                     try {
-                        /*
-                        [Header Byte],[Packet Count],[n Bytes of Data.....],[Check Sum]
-                        Header Byte = 0x7e
-                        Packet Count = Data bytes excluding Header Byte, Packet Count & Check Sum
-                        Check Sum = 0xff – (8 bit sum of all data bytes)
-
-                         */
-                        // questa è la stringa uffciale per farlo svegliare "0x7e,0x01,0x2b,0xd4"
-                        // basandomi sul caso e la fortuna questo sito (http://www.rapidtables.com/convert/number/ascii-to-hex.htm)
-                        // dice che effettivamente 2b equivale a "+"
-                        // per quanto riguarda il checksum con un unico valore è semplicemente ad es. 0xff - 0x2b = 0xd4
-                        // per fare questi conti http://www.miniwebtool.com/hex-calculatornew
-
                         sPort.write(hexStringToByteArray("0x7e01649b"), 200);
-                        Log.e(TAG, "sembra aver funzionato, invio dati");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        button_stop.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        sPort.write(hexStringToByteArray("0x7e0120df"), 200);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        b_crabLeft.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        sPort.write(hexStringToByteArray("0x7e01718e"), 200);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        b_crabRight.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        sPort.write(hexStringToByteArray("0x7e01659a"), 200);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error IOex, invio dati");
+                    }
+                }
+            }
+
+        });
+
+        b_test.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (serialOk){
+                    try {
+                        if (!headTest) {
+                            sPort.write(hexStringToByteArray("0x7e0348007f38"), 200);
+                            headTest = true;
+                        } else{
+                            headTest = false;
+                            sPort.write(hexStringToByteArray("0x7e03480000b7"), 200);
+                        }
                     } catch (IOException e) {
                         Log.e(TAG, "Error IOex, invio dati");
                     }
@@ -277,7 +309,7 @@ public class SerialConsoleActivity extends Activity {
         super.onResume();
         Log.d(TAG, "Resumed, port=" + sPort);
         if (sPort == null) {
-            mTitleTextView.setText("No serial device.");
+            Log.d(TAG, "onResume: sPort is Null");
         } else {
             final UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
 
@@ -285,7 +317,7 @@ public class SerialConsoleActivity extends Activity {
             Log.d(TAG, "Resumed, port=" + sPort.getDriver());
             Log.d(TAG, "Resumed, port=" + sPort.getDriver().getDevice());
             if (connection == null) {
-                mTitleTextView.setText("Opening device failed");
+                Log.d(TAG, "onResume: Opening device failed");
                 return;
             }
 
@@ -295,7 +327,7 @@ public class SerialConsoleActivity extends Activity {
                 serialOk = true;
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
-                mTitleTextView.setText("Error opening device: " + e.getMessage());
+                Log.d(TAG, "onResume: Error opening device: " + e.getMessage());
                 serialOk = false;
                 try {
                     sPort.close();
@@ -305,9 +337,7 @@ public class SerialConsoleActivity extends Activity {
                 sPort = null;
                 return;
             }
-            mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
-
-
+            Log.d(TAG, "onResume: Serial device: " + sPort.getClass().getSimpleName());
         }
         onDeviceStateChange();
     }

@@ -48,9 +48,6 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.HexDump;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Shows a {@link ListView} of available USB devices.
  *
@@ -92,10 +89,10 @@ public class DeviceListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        /*mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mListView = (ListView) findViewById(R.id.deviceList);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mProgressBarTitle = (TextView) findViewById(R.id.progressBarTitle);
+        mProgressBarTitle = (TextView) findViewById(R.id.progressBarTitle);*/
 
         mAdapter = new ArrayAdapter<UsbSerialPort>(this,
                 android.R.layout.simple_expandable_list_item_2, mEntries) {
