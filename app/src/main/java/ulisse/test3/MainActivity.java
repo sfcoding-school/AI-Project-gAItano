@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         initLayout();
-        layout_choice.setVisibility(LinearLayout.GONE);
+        //layout_choice.setVisibility(LinearLayout.GONE);
         refreshDeviceList();
 
     }
@@ -125,7 +125,7 @@ public class MainActivity extends Activity {
     }
 
     private void showTicTacToe() {
-        if (port != null)
+        //if (port != null)
             TicTacToe.show(this, port);
     }
 
