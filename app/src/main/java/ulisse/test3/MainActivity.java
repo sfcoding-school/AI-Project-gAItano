@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         Button button_movement = (Button) findViewById(R.id.b_movement);
         Button button_TicTacToe = (Button) findViewById(R.id.b_project);
-        Button button_gioca = (Button) findViewById(R.id.button12);
+        Button button_gioca = (Button) findViewById(R.id.b_gioca);
 
         button_gioca.setOnClickListener(new View.OnClickListener() {
 
@@ -124,7 +124,6 @@ public class MainActivity extends Activity {
 
     private void showTicTacToe() {
         //if (port != null)
-            TicTacToe.show(this, port);
+        TicTacToe.show(this, port);
     }
-
 }

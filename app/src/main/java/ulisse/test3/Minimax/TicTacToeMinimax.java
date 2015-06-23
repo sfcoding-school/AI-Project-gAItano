@@ -2,8 +2,6 @@ package ulisse.test3.Minimax;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 class Point {
 
@@ -20,21 +18,9 @@ class Point {
     }
 }
 
-class PointAndScore {
-
-    int score;
-    Point point;
-
-    PointAndScore(int score, Point point) {
-        this.score = score;
-        this.point = point;
-    }
-}
-
 class Board {
 
     List<Point> availablePoints;
-    Scanner scan = new Scanner(System.in);
     int[][] board = new int[3][3];
 
     public Board() {
@@ -92,26 +78,6 @@ class Board {
         board[point.x][point.y] = player;   //player = 1 for X, 2 for O
     }
 
-    void takeHumanInput() {
-        System.out.println("Your move: ");
-        int x = scan.nextInt();
-        int y = scan.nextInt();
-        Point point = new Point(x, y);
-        placeAMove(point, 2);
-    }
-
-    public void displayBoard() {
-        System.out.println();
-
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-
-        }
-    }
-
     Point computersMove;
 
     public int minimax(int depth, int turn) {
@@ -146,13 +112,44 @@ class Board {
     }
 }
 
-public class TicTacToe {
+public class TicTacToeMinimax {
 
+    private static Board b;
+
+    public static void init_game(){
+        b = new Board();
+    }
+
+    public static void userMove(int row, int column){
+        b.placeAMove(new Point(row, column), 2);
+    }
+
+    public static int[] computerMove(){
+        b.minimax(0, 1);
+        b.placeAMove(b.computersMove, 1);
+        return new int[] {b.computersMove.x, b.computersMove.y};
+    }
+
+    public static boolean gameOver(){
+        return b.isGameOver();
+    }
+
+    public static String partitaFinita(){
+        if (b.hasXWon())
+            return "Unfortunately, you lost!";
+        else if (b.hasOWon())
+            return "You win!"; //Can't happen
+        else
+            return "It's a draw!";
+    }
+
+    /*
     public static void main(String[] args) {
         Board b = new Board();
         Random rand = new Random();
 
         b.displayBoard();
+
 
         System.out.println("Select turn:\n\n1. Computer 2. User: ");
         int choice = b.scan.nextInt();
@@ -162,8 +159,8 @@ public class TicTacToe {
             b.displayBoard();
         }
 
+
         while (!b.isGameOver()) {
-            System.out.println("Your move: ");
             Point userMove = new Point(b.scan.nextInt(), b.scan.nextInt());
 
             b.placeAMove(userMove, 2); //2 for O and O is the user
@@ -182,4 +179,5 @@ public class TicTacToe {
         else
             System.out.println("It's a draw!");
     }
+*/
 }

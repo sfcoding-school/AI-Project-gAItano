@@ -38,6 +38,10 @@
             android:name=".TicTacToe"
             android:label="@string/title_activity_tic_tac_toe" >
         </activity>
+        <activity
+            android:name=".GiocaActivity"
+            android:label="Gioca" >
+        </activity>
     </application>
 
 </manifest> <!-- android:name=".DeviceListActivity_nonUtilizzata" -->
