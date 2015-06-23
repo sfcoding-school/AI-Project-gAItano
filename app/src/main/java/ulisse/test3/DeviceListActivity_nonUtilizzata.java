@@ -200,7 +200,7 @@ public class DeviceListActivity_nonUtilizzata extends Activity {
     }
 
     private void showConsoleActivity(UsbSerialPort port) {
-        SerialConsoleActivity.show(this, port);
+        GestionMovimentoUI.show(this, port);
     }
 
 }

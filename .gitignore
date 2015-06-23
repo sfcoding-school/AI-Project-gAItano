@@ -4,5 +4,7 @@
 /.idea/libraries
 .DS_Store
 /build
+/usbSerialForAndroid/build
+/openCVLibrary249/build
 /captures
 *~

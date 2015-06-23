@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/matteo/Desktop/gAitano/openCVLibrary249/src/main/aidl/org/opencv/engine/OpenCVEngineInterface.aidl
+ * Original file: /home/ulisse/Documenti/gAitano/openCVLibrary249/src/main/aidl/org/opencv/engine/OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**

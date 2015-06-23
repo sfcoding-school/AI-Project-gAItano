@@ -11,12 +11,17 @@ package ulisse.test3.MovementLibrary;
 import android.content.Context;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.os.SystemClock;
 import android.util.Log;
 
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -115,4 +120,18 @@ public class Movement extends MovementHex {
 
     }
 
+    //Questo metodo trova e restituisce l'eventuale seriale connessa al device
+    // utilizza la libreria usbSerialForAndroid
+    public static List<UsbSerialPort> searchUsbSerial(UsbManager mUsbManager){
+        Log.d("test", "Refreshing device list ...");
+        SystemClock.sleep(1000);
+        final List<UsbSerialDriver> drivers =
+                UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
+        final List<UsbSerialPort> result = new ArrayList<UsbSerialPort>();
+        for (final UsbSerialDriver driver : drivers) {
+            final List<UsbSerialPort> ports = driver.getPorts();
+            result.addAll(ports);
+        }
+        return result;
+    }
 }

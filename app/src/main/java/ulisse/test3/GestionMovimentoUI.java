@@ -28,19 +28,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import ulisse.test3.MovementLibrary.Movement;
 
 
-public class SerialConsoleActivity extends Activity {
+public class GestionMovimentoUI extends Activity {
 
     private static UsbSerialPort sPort = null;
-    Movement test;
+    Movement movementClass;
     private boolean headTest = false;
+    private boolean headTestLR = false;
 
 /*
     private final SerialInputOutputManager.Listener mListener =
@@ -53,10 +52,10 @@ public class SerialConsoleActivity extends Activity {
 
                 @Override
                 public void onNewData(final byte[] data) {
-                    SerialConsoleActivity.this.runOnUiThread(new Runnable() {
+                    GestionMovimentoUI.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            SerialConsoleActivity.this.updateReceivedData(data);
+                            GestionMovimentoUI.this.updateReceivedData(data);
                         }
                     });
                 }
@@ -74,12 +73,12 @@ public class SerialConsoleActivity extends Activity {
         super.onCreate(savedInstanceState);
 
 
-        setContentView(R.layout.serial_console);
+        setContentView(R.layout.movement);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //mDumpTextView = (TextView) findViewById(R.id.consoleText);
         //mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
-        test = new Movement(getApplicationContext(), sPort);
+        movementClass = new Movement(getApplicationContext(), sPort);
 
         Button button_wakeUP = (Button) findViewById(R.id.button9);
         Button button_moveForward = (Button) findViewById(R.id.button2);
@@ -90,14 +89,42 @@ public class SerialConsoleActivity extends Activity {
         Button b_crabLeft = (Button) findViewById(R.id.button6);
         Button b_crabRight = (Button) findViewById(R.id.button7);
 
-        Button b_test = (Button) findViewById(R.id.button8);
+        Button b_headUD = (Button) findViewById(R.id.button8);
         Button b_powerOFF = (Button) findViewById(R.id.button);
+
+        Button b_headLR = (Button) findViewById(R.id.button10);
+
+        Button b_test = (Button) findViewById(R.id.button11);
+
+        b_test.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                    movementClass.executeCommand("test");
+
+            }
+        });
+
+        b_headLR.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (!headTestLR) {
+                    movementClass.executeCommand("headLeft");
+                    headTestLR = true;
+                } else {
+                    headTestLR = false;
+                    movementClass.executeCommand("headDown");
+                }
+            }
+        });
 
         button_wakeUP.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("wakeUP");
+                movementClass.executeCommand("wakeUP");
             }
         });
 
@@ -105,7 +132,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("powerOFF");
+                movementClass.executeCommand("powerOFF");
             }
         });
 
@@ -113,7 +140,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("Forward");
+                movementClass.executeCommand("Forward");
             }
         });
 
@@ -121,7 +148,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("Backward");
+                movementClass.executeCommand("Backward");
             }
         });
 
@@ -129,7 +156,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("rotateLeft");
+                movementClass.executeCommand("rotateLeft");
             }
         });
 
@@ -137,7 +164,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("rotateRight");
+                movementClass.executeCommand("rotateRight");
             }
 
         });
@@ -146,7 +173,7 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("stop");
+                movementClass.executeCommand("stop");
             }
 
         });
@@ -155,28 +182,29 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("crabLeft");
+                movementClass.executeCommand("crabLeft");
             }
+
         });
 
         b_crabRight.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                test.executeCommand("crabRight");
+                movementClass.executeCommand("crabRight");
             }
         });
 
-        b_test.setOnClickListener(new View.OnClickListener() {
+        b_headUD.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 if (!headTest) {
-                    test.executeCommand("headUP");
+                    movementClass.executeCommand("headUP");
                     headTest = true;
                 } else {
                     headTest = false;
-                    test.executeCommand("headDown");
+                    movementClass.executeCommand("headDown");
                 }
             }
         });
@@ -185,19 +213,19 @@ public class SerialConsoleActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        test.pauseActivity();
+        movementClass.pauseActivity();
         finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        test.init_connection();
+        movementClass.init_connection();
     }
 
     static void show(Context context, UsbSerialPort port) {
         sPort = port;
-        final Intent intent = new Intent(context, SerialConsoleActivity.class);
+        final Intent intent = new Intent(context, GestionMovimentoUI.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
     }
