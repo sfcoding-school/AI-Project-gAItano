@@ -19,7 +19,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 
-public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener {
+public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -92,13 +92,10 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     }
 
-
     @Override
-    public Mat onCameraFrame(Mat inputFrame) {
-        return ((CameraBridgeViewBase.CvCameraViewFrame) inputFrame).rgba();
-    }
-
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         return inputFrame.rgba();
     }
+
+
 }
