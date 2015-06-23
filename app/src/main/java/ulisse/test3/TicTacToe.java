@@ -16,10 +16,23 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener {
+public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+
+    private Mat                    mIntermediateMat;
+    private Mat                    mGray;
+    Mat hierarchy;
+    List<MatOfPoint> contours;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -60,6 +73,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.OpenCvView);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+
     }
 
     @Override
@@ -84,7 +99,9 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-
+        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
+        mGray = new Mat(height, width, CvType.CV_8UC1);
+        hierarchy = new Mat();
     }
 
     @Override
@@ -92,13 +109,18 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     }
 
-
     @Override
-    public Mat onCameraFrame(Mat inputFrame) {
-        return ((CameraBridgeViewBase.CvCameraViewFrame) inputFrame).rgba();
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        Imgproc.threshold(inputFrame.gray(),inputFrame.gray(),127,255,Imgproc.THRESH_TOZERO);
+        contours = new ArrayList<MatOfPoint>();
+        hierarchy = new Mat();
+        mGray = inputFrame.gray();
+
+        Imgproc.Canny(mGray, mIntermediateMat, 80, 100);
+        Imgproc.findContours(mIntermediateMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+        Imgproc.drawContours(mGray, contours, -1, new Scalar(Math.random() * 255, Math.random() * 255, Math.random() * 255)); //, 2, 8, hierarchy, 0, new Point())
+        return mGray;
     }
 
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
-    }
+
 }
