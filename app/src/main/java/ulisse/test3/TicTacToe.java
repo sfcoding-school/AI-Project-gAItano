@@ -1,9 +1,13 @@
 package ulisse.test3;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 
 public class TicTacToe extends Activity {
@@ -34,5 +38,11 @@ public class TicTacToe extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    static void show(Context context, UsbSerialPort port) {
+        final Intent intent = new Intent(context, TicTacToe.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        context.startActivity(intent);
     }
 }
