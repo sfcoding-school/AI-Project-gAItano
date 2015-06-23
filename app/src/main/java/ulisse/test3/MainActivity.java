@@ -5,20 +5,18 @@ import android.content.Context;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ulisse.test3.MovementLibrary.Movement;
 
 public class MainActivity extends Activity {
 
@@ -26,10 +24,8 @@ public class MainActivity extends Activity {
     private LinearLayout layout_choice;
     private ProgressBar mProgressBar;
     private UsbManager mUsbManager;
-    private List<UsbSerialPort> mEntries = new ArrayList<UsbSerialPort>();
+    private List<UsbSerialPort> mEntries = new ArrayList<>();
     private UsbSerialPort port = null;
-    private Button button_movement;
-    private Button button_TicTacToe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +44,8 @@ public class MainActivity extends Activity {
         layout_choice = (LinearLayout) findViewById(R.id.layout_choice);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        button_movement = (Button) findViewById(R.id.b_movement);
-        button_TicTacToe = (Button) findViewById(R.id.b_project);
+        Button button_movement = (Button) findViewById(R.id.b_movement);
+        Button button_TicTacToe = (Button) findViewById(R.id.b_project);
 
         button_movement.setOnClickListener(new View.OnClickListener() {
 
@@ -77,19 +73,7 @@ public class MainActivity extends Activity {
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
             @Override
             protected List<UsbSerialPort> doInBackground(Void... params) {
-                Log.d("test", "Refreshing device list ...");
-                SystemClock.sleep(1000);
-
-                final List<UsbSerialDriver> drivers =
-                        UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
-
-                final List<UsbSerialPort> result = new ArrayList<UsbSerialPort>();
-                for (final UsbSerialDriver driver : drivers) {
-                    final List<UsbSerialPort> ports = driver.getPorts();
-                    result.addAll(ports);
-                }
-
-                return result;
+                return Movement.searchUsbSerial(mUsbManager);
             }
 
             @Override
@@ -121,7 +105,7 @@ public class MainActivity extends Activity {
 
     private void showConsoleActivity() {
        if (port != null)
-            SerialConsoleActivity.show(this, port);
+            GestionMovimentoUI.show(this, port);
     }
 
     private void showTicTacToe() {
