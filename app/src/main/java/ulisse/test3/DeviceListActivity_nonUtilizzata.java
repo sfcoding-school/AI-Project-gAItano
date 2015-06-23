@@ -53,9 +53,9 @@ import com.hoho.android.usbserial.util.HexDump;
  *
  * @author mike wakerly (opensource@hoho.com)
  */
-public class DeviceListActivity extends Activity {
+public class DeviceListActivity_nonUtilizzata extends Activity {
 
-    private final String TAG = DeviceListActivity.class.getSimpleName();
+    private final String TAG = DeviceListActivity_nonUtilizzata.class.getSimpleName();
 
     private UsbManager mUsbManager;
     private ListView mListView;
