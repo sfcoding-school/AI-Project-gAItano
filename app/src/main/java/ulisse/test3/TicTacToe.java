@@ -55,6 +55,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     Mat hierarchy;
     List<MatOfPoint> contours;
     List<List<Point>> MarkerList;
+    List<Point> m_markerCorner;
 
     private final static double MIN_DISTANCE = 10;
 
@@ -94,6 +95,12 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         super.onCreate(savedInstanceState);
 
         MarkerList = new ArrayList<List<Point>>();
+        m_markerCorner = new ArrayList<>();
+        m_markerCorner.add(new Point(0,0));
+        m_markerCorner.add(new Point(6,0));
+        m_markerCorner.add(new Point(6,6));
+        m_markerCorner.add(new Point(0, 6));
+
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_tic_tac_toe);
@@ -244,6 +251,33 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             } else {Log.e("testPair","MarkeCandidato è null");}
 
 
+        Mat src = new Mat(4,1,CvType.CV_32FC2);
+        Mat dst = new Mat(4,1,CvType.CV_32FC2);
+
+        Mat m_markerCornerMat = new Mat();
+        Mat canonicalMarker = new Mat();
+        //Converters.vector_Point_to_Mat(m_markerCorner,m_markerCornerMat);
+        for (int i=0; i<MarkerList.size(); i++){
+            List<Point> MarkerProva = MarkerList.get(i);
+
+            src.put(0, 0,   MarkerProva.get(0).x,
+                            MarkerProva.get(0).y,
+                            MarkerProva.get(1).x,
+                            MarkerProva.get(1).y,
+                            MarkerProva.get(2).x,
+                            MarkerProva.get(2).y,
+                            MarkerProva.get(3).x,
+                            MarkerProva.get(3).y);
+            dst.put(0, 0, 0.0, 0.0, 6.0, 0.0, 6.0, 6.0, 0.0, 6.0);
+
+            Mat m = Imgproc.getPerspectiveTransform(src, dst);
+
+            Imgproc.warpPerspective(mGray, canonicalMarker, m, mGray.size());
+        }
+
+
+
+        /*
 
         MatOfKeyPoint points = new MatOfKeyPoint();
         MatOfKeyPoint marker_points = new MatOfKeyPoint();
@@ -259,7 +293,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
         Features2d.drawKeypoints(mGray, points, mGray, redcolor, 3);
 
-
+*/
         /*
         Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.markers));
         Mat matrix2 = imread("markers.jpg", 0);
