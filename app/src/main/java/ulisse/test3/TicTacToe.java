@@ -89,16 +89,17 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ;
 
         Log.i("PROVA tag 2", "called onCreate");
         super.onCreate(savedInstanceState);
+
+        MarkerList = new ArrayList<List<Point>>();
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_tic_tac_toe);
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.OpenCvView);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-
 
     }
 
@@ -148,10 +149,9 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         List<MatOfPoint2f> newContours = new ArrayList<>();
         List<MatOfPoint2f> approxContours = new ArrayList<>();
         List<Point> approxPoints = new ArrayList<Point>();
-        List<Point> MarkerCandidato = null;
-        List<Pair> tooNearMarker= null;
-
-
+        List<Point> MarkerCandidato;
+        List<Pair> tooNearMarker = new ArrayList<Pair>();
+        List<List<Point>> MarkerDetected = new ArrayList<>();
 
         for (int i = 0; i < contours.size(); i++) {
             MatOfPoint2f newPoint = new MatOfPoint2f(contours.get(i).toArray());
@@ -166,34 +166,28 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             Imgproc.approxPolyDP(newPoint, approxCurve, eps, true);
             Converters.Mat_to_vector_Point(approxCurve, approxPoints);
 
-            Log.e("testPair", "eps " + String.valueOf(eps) + " approxContours.size()" + approxContours.size());
-            if (approxContours.size() == 4) {
+            //Log.e("testPair", "eps " + String.valueOf(eps) + " approxCurve.total() " + approxCurve.total() );
+            if (approxCurve.total() == 4) {
                 //if (Imgproc.isContourConvex(approxCurve)) { //riconverto in Mat?
                 double minDistFound = Double.MAX_VALUE;
-                int[] points = new int[8];// [x1 y1 x2 y2 x3 y3 x4 y4]
-                approxCurve.get(0, 0, points);
                 // look for the min distance
-                for (int j = 0; j <= 4; j += 2) {
-                    double d = Math.sqrt((points[j] - points[(j + 2) % 4]) * (points[j] - points[(j + 2) % 4]) +
-                            (points[j + 1] - points[(j + 3) % 4]) * (points[j + 1] - points[(j + 3) % 4]));
-                    if (d < minDistFound)
-                        minDistFound = d;
-                }
-                
-                if (minDistFound > MIN_DISTANCE) {
-                    // create a candidate marker
-                    MarkerCandidato.add(new Point(points[0], points[1]));
-                    MarkerCandidato.add(new Point(points[2], points[3]));
-                    MarkerCandidato.add(new Point(points[4], points[5]));
-                    MarkerCandidato.add(new Point(points[6], points[7]));
+                for (int j = 0; j < 4; j++) {
+                    Point side = subsractPoint(approxPoints.get(j), approxPoints.get((j+1)%4));
+                    double sqauredSideLenght = side.dot(side);
+                    minDistFound = Math.min(minDistFound, sqauredSideLenght);
                 }
 
-                double v1x = MarkerCandidato.get(1).x - MarkerCandidato.get(0).x;
-                double v1y = MarkerCandidato.get(1).y - MarkerCandidato.get(0).y;
-                Point v1 = new Point(v1x, v1y);
-                double v2x = MarkerCandidato.get(2).x - MarkerCandidato.get(0).x;
-                double v2y = MarkerCandidato.get(2).y - MarkerCandidato.get(0).y;
-                Point v2 = new Point(v2x, v2y);
+
+                if (minDistFound > 0) {
+                    // create a candidate marker
+                    for (int j = 0; j < 4; j ++) {
+                        MarkerCandidato.add(new Point(approxPoints.get(j).x, approxPoints.get(j).y));
+                    }
+                }
+
+
+                Point v1 = subsractPoint( MarkerCandidato.get(1),MarkerCandidato.get(0));
+                Point v2 = subsractPoint( MarkerCandidato.get(2),MarkerCandidato.get(0));
 
                 double o = (v1.x * v2.y) - (v1.y * v2.x);
                 if (o < 0.0) {
@@ -201,16 +195,15 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                     MarkerCandidato.set(3, v1);
                     MarkerCandidato.set(1, v3);
                 }
-                Log.e("testPair", "aggiungo" + MarkerCandidato);
+                //Log.e("testPair", "aggiungo" + MarkerCandidato);
                 MarkerList.add(MarkerCandidato);
             }
         }
-            if (MarkerList != null) {
+            if (MarkerList.size() > 0) {
 
-                Array[][] Marker;
-                for (int i = 0; i <= MarkerList.size(); i++) {
+                for (int i = 0; i < MarkerList.size(); i++) {
                     List<Point> m1 = MarkerList.get(i);
-                    for (int j = i+1; j <= MarkerList.size(); j++){
+                    for (int j = i+1; j < MarkerList.size(); j++){
                         List<Point> m2 = MarkerList.get(j);
                         float disSquared = 0;
                         for (int c=0; c<4;c++){
@@ -228,12 +221,25 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
                 boolean[] MarkerMask = new boolean[MarkerList.size()];
                 Arrays.fill(MarkerMask, false);
-                Log.e("testPair", String.valueOf(tooNearMarker.size()));
+                //Log.e("testPair", String.valueOf(tooNearMarker.size()));
                 for (int i=0;i<tooNearMarker.size();i++){
-                    //List<Point> p1 = MarkerList.get(tooNearMarker.get(i).first);
+                    float p1 = perimeter(MarkerList.get(Integer.parseInt(tooNearMarker.get(i).first.toString())));
+                    float p2 = perimeter(MarkerList.get(Integer.parseInt(tooNearMarker.get(i).second.toString())));
                     Log.e("testPair", tooNearMarker.get(0).first.toString());
+                    int removalIndex;
+                    if (p1>p2){
+                        removalIndex = Integer.parseInt(tooNearMarker.get(i).second.toString());
+                    }else {
+                        removalIndex = Integer.parseInt(tooNearMarker.get(i).first.toString());
+                    }
+                    MarkerMask[removalIndex] = true;
                 }
 
+                for (int i = 0; i< MarkerList.size(); i++){
+                    if (!MarkerMask[i]){
+                        MarkerDetected.add(MarkerList.get(i));
+                    }
+                }
 
             } else {Log.e("testPair","MarkeCandidato è null");}
 
@@ -262,6 +268,26 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
 
         return mGray;
+    }
+
+    private Point subsractPoint(Point v1, Point v2){
+        double v1x = v1.x - v2.x;
+        double v1y = v1.y - v2.y;
+        return new Point(v1x, v1y);
+
+    }
+
+    private float perimeter(List<Point> v){
+        float peri = 0;
+        for (int i=0; i<v.size(); i++){
+            peri += euqlDist(v.get(i),v.get((i+1)%4));
+        }
+        return peri;
+    }
+
+    private float euqlDist(Point a, Point b){
+        double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
+        return (float) res;
     }
 
 
