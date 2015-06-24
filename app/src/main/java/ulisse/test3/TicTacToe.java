@@ -160,7 +160,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
 
             newContours.add(newPoint);
-            double eps = (int) newPoint.elemSize() * 0.05;
+            double eps = (int) newPoint.total() * 0.05;
 
             Imgproc.approxPolyDP(newPoint, approxCurve, eps, true);
             Converters.Mat_to_vector_Point(approxCurve, approxPoints);
