@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -240,6 +241,24 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         Mat m_markerCornerMat = new Mat();
         Mat canonicalMarker = new Mat();
         //Converters.vector_Point_to_Mat(m_markerCorner,m_markerCornerMat);
+
+
+        Mat prova= new Mat(400,400,CvType.CV_8UC1);
+        org.opencv.core.Rect r = new org.opencv.core.Rect(10,10,50,50);
+        org.opencv.core.Mat subView = prova.submat(r);
+        Mat zero = Mat.zeros(5, 5, CvType.CV_8UC1);// bitMatrix = new org.opencv.core.Mat.zeros(5,5,CvType.CV_8UC1);
+        int cellsize = 50*50;
+
+        for (int x=0; x<5; x++){
+            for (int y=0; y<5; y++){
+                int cellX = (x+1)*cellsize;
+                int cellY = (y+1)*cellsize;
+                //Mat cell =  new org.opencv.core.Rect(cellX,cellY,cellsize,cellsize);
+            }
+        }
+
+        float data[][] = {{1,1,1,1,1},{1,0,1,1,1},{1,1,0,0,1},{1,1,0,1,1},{1,1,1,1,1}};
+
         for (int i=0; i<MarkerList.size(); i++){
             List<Point> MarkerProva = MarkerList.get(i);
 
@@ -255,13 +274,19 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
             Mat m = Imgproc.getPerspectiveTransform(src, dst);
 
-            Imgproc.warpPerspective(frameCapture, canonicalMarker, m, frameCapture.size());
+            Imgproc.warpPerspective(frameCapture, canonicalMarker, m, canonicalMarker.size());
+
+            Imgproc.threshold(canonicalMarker, canonicalMarker, 125, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
         }
+
+
 
         Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
         Bitmap bm = Bitmap.createBitmap(canonicalMarker.cols(),canonicalMarker.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(canonicalMarker,bm);
         test.setImageBitmap(bm);
+
+
     }
 
     @Override
@@ -298,11 +323,16 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        //CAMBIARE!
-        Imgproc.threshold(inputFrame.gray(), inputFrame.gray(), 127, 255, Imgproc.THRESH_TOZERO);
+        //Nuova
+        Imgproc.cvtColor(inputFrame.rgba(),mGray,Imgproc.COLOR_RGB2GRAY);
+        Imgproc.adaptiveThreshold(mGray,mGray,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,7,7);
+        //Vecchia
+        //Imgproc.threshold(inputFrame.gray(), inputFrame.gray(), 127, 255, Imgproc.THRESH_TOZERO);
         contours = new ArrayList<MatOfPoint>();
         hierarchy = new Mat();
-        mGray = inputFrame.gray();
+        //mGray = inputFrame.gray();
+
+
 
 
 
