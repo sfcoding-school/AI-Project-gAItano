@@ -160,12 +160,13 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
 
             newContours.add(newPoint);
+
             double eps = (int) newPoint.total() * 0.05;
 
             Imgproc.approxPolyDP(newPoint, approxCurve, eps, true);
             Converters.Mat_to_vector_Point(approxCurve, approxPoints);
 
-            Log.e("testPair", "eps " + String.valueOf(eps));
+            Log.e("testPair", "eps " + String.valueOf(eps) + " approxContours.size()" + approxContours.size());
             if (approxContours.size() == 4) {
                 //if (Imgproc.isContourConvex(approxCurve)) { //riconverto in Mat?
                 double minDistFound = Double.MAX_VALUE;
