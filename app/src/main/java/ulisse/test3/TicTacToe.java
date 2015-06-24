@@ -179,7 +179,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                     if (d < minDistFound)
                         minDistFound = d;
                 }
-
+                
                 if (minDistFound > MIN_DISTANCE) {
                     // create a candidate marker
                     MarkerCandidato.add(new Point(points[0], points[1]));
