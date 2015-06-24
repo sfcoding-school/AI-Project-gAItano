@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -200,7 +201,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                 MarkerList.add(MarkerCandidato);
             }
         }
-            if (MarkerCandidato != null) {
+            if (MarkerList != null) {
 
                 Array[][] Marker;
                 for (int i = 0; i <= MarkerList.size(); i++) {
@@ -215,6 +216,9 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                             disSquared += v.dot(v);
                         }
                         disSquared /= 4;
+                        if (disSquared<100){
+                            //List<Pair> tooNearMarker.add(i,j);
+                        }
                     }
                 }
             } else {Log.e("TicTacToe","MarkeCandidato è null");}
