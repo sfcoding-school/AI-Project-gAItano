@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 
@@ -148,6 +149,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         List<MatOfPoint2f> approxContours = new ArrayList<>();
         List<Point> approxPoints = new ArrayList<Point>();
         List<Point> MarkerCandidato = null;
+        List<Pair> tooNearMarker= null;
 
 
 
@@ -158,11 +160,12 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
 
             newContours.add(newPoint);
-            double eps = (int) newPoint.total() * 0.05;
+            double eps = (int) newPoint.elemSize() * 0.05;
 
             Imgproc.approxPolyDP(newPoint, approxCurve, eps, true);
             Converters.Mat_to_vector_Point(approxCurve, approxPoints);
 
+            Log.e("testPair", "eps " + String.valueOf(eps));
             if (approxContours.size() == 4) {
                 //if (Imgproc.isContourConvex(approxCurve)) { //riconverto in Mat?
                 double minDistFound = Double.MAX_VALUE;
@@ -197,7 +200,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                     MarkerCandidato.set(3, v1);
                     MarkerCandidato.set(1, v3);
                 }
-
+                Log.e("testPair", "aggiungo" + MarkerCandidato);
                 MarkerList.add(MarkerCandidato);
             }
         }
@@ -217,11 +220,21 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                         }
                         disSquared /= 4;
                         if (disSquared<100){
-                            //List<Pair> tooNearMarker.add(i,j);
+                            tooNearMarker.add(new Pair(i,j));
                         }
                     }
                 }
-            } else {Log.e("TicTacToe","MarkeCandidato è null");}
+
+                boolean[] MarkerMask = new boolean[MarkerList.size()];
+                Arrays.fill(MarkerMask, false);
+                Log.e("testPair", String.valueOf(tooNearMarker.size()));
+                for (int i=0;i<tooNearMarker.size();i++){
+                    //List<Point> p1 = MarkerList.get(tooNearMarker.get(i).first);
+                    Log.e("testPair", tooNearMarker.get(0).first.toString());
+                }
+
+
+            } else {Log.e("testPair","MarkeCandidato è null");}
 
 
 
