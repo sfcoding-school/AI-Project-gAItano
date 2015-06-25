@@ -42,6 +42,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
@@ -277,17 +278,30 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             Imgproc.warpPerspective(frameCapture, canonicalMarker, m, canonicalMarker.size());
 
             Imgproc.threshold(canonicalMarker, canonicalMarker, 125, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
+
+        }
+
+        Mat bitMatrix = Mat.zeros(5, 5, CvType.CV_8UC1);
+
+        for (int y=0; y<5; y++){
+            for (int x=0; x<5; x++){
+                int cellX = (x+1)*cellsize;
+                int cellY = (y+1)*cellsize;
+                //Mat image = new Rect(cellX,cellY,cellsize,cellsize);
+            }
         }
 
 
 
         Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
         Bitmap bm = Bitmap.createBitmap(canonicalMarker.cols(),canonicalMarker.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(canonicalMarker,bm);
+        Utils.matToBitmap(canonicalMarker, bm);
         test.setImageBitmap(bm);
 
 
     }
+
+
 
     @Override
     public void onPause() {
