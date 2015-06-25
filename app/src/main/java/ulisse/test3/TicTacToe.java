@@ -191,6 +191,9 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                 MarkerList.add(MarkerCandidato);
             }
         }
+
+        Log.e("testSize", String.valueOf(MarkerList.size()));
+
         if (MarkerList.size() > 0) {
 
             for (int i = 0; i < MarkerList.size(); i++) {
@@ -281,6 +284,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
         }
 
+        /*
         Mat bitMatrix = Mat.zeros(5, 5, CvType.CV_8UC1);
 
         for (int y=0; y<5; y++){
@@ -290,10 +294,10 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
                 //Mat image = new Rect(cellX,cellY,cellsize,cellsize);
             }
         }
+        */
 
 
-
-        Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
+        //Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
         Bitmap bm = Bitmap.createBitmap(canonicalMarker.cols(),canonicalMarker.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(canonicalMarker, bm);
         test.setImageBitmap(bm);

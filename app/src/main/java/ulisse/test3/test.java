@@ -153,7 +153,7 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.e(TAG, "Failed to load cascade. Exception thrown: " + e);
-                    }0
+                    }
                     mOpenCvCameraView.setCameraIndex(1);
                     mOpenCvCameraView.enableFpsMeter();
                     mOpenCvCameraView.enableView();
