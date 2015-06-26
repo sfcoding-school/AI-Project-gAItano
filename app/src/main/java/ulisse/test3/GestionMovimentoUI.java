@@ -101,7 +101,7 @@ public class GestionMovimentoUI extends Activity {
             @Override
             public void onClick(View arg0) {
 
-                    movementClass.executeCommand("test");
+                    movementClass.executeCommand("test2");
 
             }
         });

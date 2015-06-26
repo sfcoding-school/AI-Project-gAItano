@@ -4,25 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import java.util.Arrays;
-import java.util.IllegalFormatCodePointException;
-import java.util.Vector;
 
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
@@ -35,20 +23,12 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.features2d.FeatureDetector;
-import org.opencv.features2d.Features2d;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
 
-import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +36,7 @@ import static java.lang.Math.round;
 import static org.opencv.highgui.Highgui.imread;
 
 
-public class test extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class test2 extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private Mat mIntermediateMat;
     private Mat mGray;
@@ -151,32 +131,45 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
         Core.addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, red_hue_image);
         Imgproc.GaussianBlur(red_hue_image, red_hue_image, new Size(9, 9), 2, 2);
 
-        Mat circles = new Mat(); //sarebbe da usare un vettore ??
-        Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows() / 8, 100, 20, 0, 0);
+        //Mat circles = new Mat(); //sarebbe da usare un vettore ??
+        //Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows() / 8, 100, 20, 0, 0);
+
+        Mat circles = new Mat();
+
+        Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows()/8, 100, 20, 0, 0);
 
 
+        int numberOfCircles = (circles.rows() == 0) ? 0 : circles.cols();
 
-        double[] circleCoordinates = circles.get(0, 0);
-
-        if (circleCoordinates != null) {
-
-            int x = (int) circleCoordinates[0], y = (int) circleCoordinates[1];
-
-            Point center = new Point(x, y);
-
-            int radius = (int) circleCoordinates[2];
+        List<Point> proviamoAfareIlTriangolo = new ArrayList<>();
 
 
-            Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 4);
+        for (int i=0; i<numberOfCircles; i++) {
+
+            double[] circleCoordinates = circles.get(0, i);
+
+            if (circleCoordinates != null) {
+
+                int x = (int) circleCoordinates[0], y = (int) circleCoordinates[1];
+
+                Point center = new Point(x, y);
+                proviamoAfareIlTriangolo.add(center);
+
+                int radius = (int) circleCoordinates[2];
 
 
-            Core.rectangle(veryOriginal, new Point(x - 5, y - 5),
-                    new Point(x + 5, y + 5),
-                    new Scalar(0, 128, 255), -1);
+                Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 4);
 
-       /* Point center = new Point(round(circles.height()), round(circles.width()));
-        int radius = round(circles.width());
-        Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 5);*/
+
+                Core.rectangle(veryOriginal, new Point(x - 5, y - 5),
+                        new Point(x + 5, y + 5),
+                        new Scalar(0, 128, 255), -1);
+
+
+            } else {
+                Log.e("trovaCerchi", "NON HO TROVATO NIENTE");
+            }
+        }
 
 
             //Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
@@ -184,11 +177,9 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
             Utils.matToBitmap(veryOriginal, bm);
             test.setImageBitmap(bm);
 
-        } else {
-            Log.e("trovaCerchi", "NON HO TROVATO NIENTE");
         }
 
-    }
+
 
 
 
@@ -206,7 +197,7 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
     }
 
     static void show(Context context, UsbSerialPort port) {
-        final Intent intent = new Intent(context, test.class);
+        final Intent intent = new Intent(context, test2.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
     }

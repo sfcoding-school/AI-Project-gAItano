@@ -123,7 +123,7 @@ public class Movement extends MovementHex {
     //Questo metodo trova e restituisce l'eventuale seriale connessa al device
     // utilizza la libreria usbSerialForAndroid
     public static List<UsbSerialPort> searchUsbSerial(UsbManager mUsbManager){
-        Log.d("test", "Refreshing device list ...");
+        Log.d("test2", "Refreshing device list ...");
         SystemClock.sleep(1000);
         final List<UsbSerialDriver> drivers =
                 UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
