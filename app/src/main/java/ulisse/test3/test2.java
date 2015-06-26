@@ -139,6 +139,7 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
         Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows()/8, 100, 20, 0, 0);
 
 
+
         int numberOfCircles = (circles.rows() == 0) ? 0 : circles.cols();
 
         List<Point> proviamoAfareIlTriangolo = new ArrayList<>();
@@ -155,11 +156,9 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
                 Point center = new Point(x, y);
                 proviamoAfareIlTriangolo.add(center);
 
+
                 int radius = (int) circleCoordinates[2];
-
-
                 Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 4);
-
 
                 Core.rectangle(veryOriginal, new Point(x - 5, y - 5),
                         new Point(x + 5, y + 5),
