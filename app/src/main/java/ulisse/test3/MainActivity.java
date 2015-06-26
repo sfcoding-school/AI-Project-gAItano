@@ -124,6 +124,7 @@ public class MainActivity extends Activity {
 
     private void showTicTacToe() {
         //if (port != null)
-        TicTacToe.show(this, port);
+        //TicTacToe.show(this, port);
+        test2.show(this, port);
     }
 }

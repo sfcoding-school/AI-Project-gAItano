@@ -50,7 +50,7 @@ public class MovementHex {
         put("headLeft","0x7e03486e0049");
 
         //inclina il corpo di 118 (parte davanti verso l'alto)
-        put("test","0x7e074276000000000047");
+        put("test2","0x7e074276000000000047");
     }};
 
     public byte[] returnCommand(String command){
