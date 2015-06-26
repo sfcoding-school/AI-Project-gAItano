@@ -2,162 +2,82 @@ package ulisse.test3;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.SeekBar;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.ImageView;
+
+import java.util.Arrays;
+import java.util.IllegalFormatCodePointException;
+import java.util.Vector;
+
+
+import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.objdetect.Objdetect;
+import org.opencv.utils.Converters;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.round;
+import static org.opencv.highgui.Highgui.imread;
+
 
 public class test extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private static final String TAG = "OCVSample::Activity";
-    private static final Scalar FACE_RECT_COLOR = new Scalar(0, 255, 0, 255);
-    public static final int JAVA_DETECTOR = 0;
-    private static final int TM_SQDIFF = 0;
-    private static final int TM_SQDIFF_NORMED = 1;
-    private static final int TM_CCOEFF = 2;
-    private static final int TM_CCOEFF_NORMED = 3;
-    private static final int TM_CCORR = 4;
-    private static final int TM_CCORR_NORMED = 5;
-
-
-    private int learn_frames = 0;
-    private Mat teplateR;
-    private Mat teplateL;
-    int method = 0;
-
-    private MenuItem mItemFace50;
-    private MenuItem mItemFace40;
-    private MenuItem mItemFace30;
-    private MenuItem mItemFace20;
-    private MenuItem mItemType;
-
-    private Mat mRgba;
+    private Mat mIntermediateMat;
     private Mat mGray;
-    // matrix for zooming
-    private Mat mZoomWindow;
-    private Mat mZoomWindow2;
+    private Mat mOrig;
+    Mat hierarchy;
+    List<MatOfPoint> contours;
+    List<List<Point>> MarkerList;
+    List<Point> m_markerCorner;
+    Button button;
+    ImageView test;
 
-    private File mCascadeFile;
-    private CascadeClassifier mJavaDetector;
-    private CascadeClassifier mJavaDetectorEye;
+    private final static double MIN_DISTANCE = 10;
 
-
-    private int mDetectorType = JAVA_DETECTOR;
-    private String[] mDetectorName;
-
-    private float mRelativeFaceSize = 0.2f;
-    private int mAbsoluteFaceSize = 0;
-
-    private CameraBridgeViewBase mOpenCvCameraView;
-
-    private SeekBar mMethodSeekbar;
-    private TextView mValue;
-
-    double xCenter = -1;
-    double yCenter = -1;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
-                    Log.i(TAG, "OpenCV loaded successfully");
-
-
-                    try {
-                        // load cascade file from application resources
-                        InputStream is = null; //= getResources().openRawResource(R.raw.lbpcascade_frontalface);
-                        File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-                        mCascadeFile = new File(cascadeDir,
-                                "lbpcascade_frontalface.xml");
-                        FileOutputStream os = null;
-                        try {
-                            os = new FileOutputStream(mCascadeFile);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        while ((bytesRead = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, bytesRead);
-                        }
-                        is.close();
-                        os.close();
-
-                        // --------------------------------- load left eye
-                        // classificator -----------------------------------
-                        InputStream iser = null; //= getResources().openRawResource(R.raw.haarcascade_lefteye_2splits);
-                        File cascadeDirER = getDir("cascadeER",
-                                Context.MODE_PRIVATE);
-                        File cascadeFileER = new File(cascadeDirER,
-                                "haarcascade_eye_right.xml");
-                        FileOutputStream oser = new FileOutputStream(cascadeFileER);
-
-                        byte[] bufferER = new byte[4096];
-                        int bytesReadER;
-                        while ((bytesReadER = iser.read(bufferER)) != -1) {
-                            oser.write(bufferER, 0, bytesReadER);
-                        }
-                        iser.close();
-                        oser.close();
-
-                        mJavaDetector = new CascadeClassifier(
-                                mCascadeFile.getAbsolutePath());
-                        if (mJavaDetector.empty()) {
-                            Log.e(TAG, "Failed to load cascade classifier");
-                            mJavaDetector = null;
-                        } else
-                            Log.i(TAG, "Loaded cascade classifier from "
-                                    + mCascadeFile.getAbsolutePath());
-
-                        mJavaDetectorEye = new CascadeClassifier(
-                                cascadeFileER.getAbsolutePath());
-                        if (mJavaDetectorEye.empty()) {
-                            Log.e(TAG, "Failed to load cascade classifier");
-                            mJavaDetectorEye = null;
-                        } else
-                            Log.i(TAG, "Loaded cascade classifier from "
-                                    + mCascadeFile.getAbsolutePath());
-
-
-
-                        cascadeDir.delete();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Failed to load cascade. Exception thrown: " + e);
-                    }
-                    mOpenCvCameraView.setCameraIndex(1);
-                    mOpenCvCameraView.enableFpsMeter();
+                    Log.i("sono qui", "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
-
                 }
                 break;
                 default: {
@@ -167,72 +87,110 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
             }
         }
     };
+    private ClassLoader context;
 
-    public test() {
-        mDetectorName = new String[2];
-        mDetectorName[JAVA_DETECTOR] = "Java";
-
-        Log.i(TAG, "Instantiated new " + this.getClass());
+    @Override
+    public void onResume() {
+        super.onResume();
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
     }
 
-    /** Called when the activity is first created. */
+
+    private CameraBridgeViewBase mOpenCvCameraView;
+
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
+    protected void onCreate(Bundle savedInstanceState) {
+
+        Log.i("PROVA tag 2", "called onCreate");
         super.onCreate(savedInstanceState);
+
+        MarkerList = new ArrayList<List<Point>>();
+        m_markerCorner = new ArrayList<>();
+        m_markerCorner.add(new Point(0,0));
+        m_markerCorner.add(new Point(6,0));
+        m_markerCorner.add(new Point(6,6));
+        m_markerCorner.add(new Point(0, 6));
+
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        setContentView(R.layout.face_detect_surface_view);
-
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
+        setContentView(R.layout.activity_tic_tac_toe);
+        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.OpenCvView);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        mMethodSeekbar = (SeekBar) findViewById(R.id.methodSeekBar);
-        mValue = (TextView) findViewById(R.id.method);
-
-        mMethodSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        button = (Button) findViewById(R.id.button12);
+        button.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
-
+            public void onClick(View arg0) {
+                doSomething();
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                                          boolean fromUser) {
-                method = progress;
-                switch (method) {
-                    case 0:
-                        mValue.setText("TM_SQDIFF");
-                        break;
-                    case 1:
-                        mValue.setText("TM_SQDIFF_NORMED");
-                        break;
-                    case 2:
-                        mValue.setText("TM_CCOEFF");
-                        break;
-                    case 3:
-                        mValue.setText("TM_CCOEFF_NORMED");
-                        break;
-                    case 4:
-                        mValue.setText("TM_CCORR");
-                        break;
-                    case 5:
-                        mValue.setText("TM_CCORR_NORMED");
-                        break;
-                }
-
-
-            }
         });
+
+        test = (ImageView) findViewById(R.id.imageView);
     }
+
+    private void doSomething() {
+
+        Mat imgOrig = mGray;
+        Mat veryOriginal = mOrig;
+
+        Mat hsv_image;
+        //Mat.cvtColor(bgr_image, hsv_image, cv::COLOR_BGR2HSV);
+        // Threshold the HSV image, keep only the red pixels
+        Mat lower_red_hue_range = new Mat();
+        Mat upper_red_hue_range = new Mat();
+        Core.inRange(imgOrig, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lower_red_hue_range);
+        Core.inRange(imgOrig, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
+
+
+
+        Mat red_hue_image = new Mat();
+        Core.addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, red_hue_image);
+        Imgproc.GaussianBlur(red_hue_image, red_hue_image, new Size(9, 9), 2, 2);
+
+        Mat circles = new Mat(); //sarebbe da usare un vettore ??
+        Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows() / 8, 100, 20, 0, 0);
+
+
+
+        double[] circleCoordinates = circles.get(0, 0);
+
+        if (circleCoordinates != null) {
+
+            int x = (int) circleCoordinates[0], y = (int) circleCoordinates[1];
+
+            Point center = new Point(x, y);
+
+            int radius = (int) circleCoordinates[2];
+
+
+            Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 4);
+
+
+            Core.rectangle(veryOriginal, new Point(x - 5, y - 5),
+                    new Point(x + 5, y + 5),
+                    new Scalar(0, 128, 255), -1);
+
+       /* Point center = new Point(round(circles.height()), round(circles.width()));
+        int radius = round(circles.width());
+        Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 5);*/
+
+
+            //Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
+            Bitmap bm = Bitmap.createBitmap(veryOriginal.cols(), veryOriginal.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(veryOriginal, bm);
+            test.setImageBitmap(bm);
+
+        } else {
+            Log.e("trovaCerchi", "NON HO TROVATO NIENTE");
+        }
+
+    }
+
+
 
     @Override
     public void onPause() {
@@ -241,258 +199,133 @@ public class test extends Activity implements CameraBridgeViewBase.CvCameraViewL
             mOpenCvCameraView.disableView();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this,
-                mLoaderCallback);
-    }
-
     public void onDestroy() {
         super.onDestroy();
-        mOpenCvCameraView.disableView();
+        if (mOpenCvCameraView != null)
+            mOpenCvCameraView.disableView();
     }
 
+    static void show(Context context, UsbSerialPort port) {
+        final Intent intent = new Intent(context, test.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        context.startActivity(intent);
+    }
+
+    @Override
     public void onCameraViewStarted(int width, int height) {
-        mGray = new Mat();
-        mRgba = new Mat();
+        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
+        mGray = new Mat(height, width, CvType.CV_8UC1);
+        mOrig = new Mat(height, width, CvType.CV_8UC1);
+        hierarchy = new Mat();
     }
 
+    @Override
     public void onCameraViewStopped() {
-        mGray.release();
-        mRgba.release();
-        mZoomWindow.release();
-        mZoomWindow2.release();
+
     }
 
+    @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        mRgba = inputFrame.rgba();
-        mGray = inputFrame.gray();
+        Imgproc.cvtColor(inputFrame.rgba(), mGray, Imgproc.COLOR_RGB2HSV);
 
-        if (mAbsoluteFaceSize == 0) {
-            int height = mGray.rows();
-            if (Math.round(height * mRelativeFaceSize) > 0) {
-                mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
-            }
-        }
+        //Imgproc.cvtColor(inputFrame.rgba(), mOrig, Imgproc.COLOR_RGB2HSV);
 
-        if (mZoomWindow == null || mZoomWindow2 == null)
-            CreateAuxiliaryMats();
+        mOrig = inputFrame.rgba();
 
-        MatOfRect faces = new MatOfRect();
-
-        if (mJavaDetector != null)
-            mJavaDetector.detectMultiScale(mGray, faces, 1.1, 2,
-                    2, // TODO: objdetect.CV_HAAR_SCALE_IMAGE
-                    new Size(mAbsoluteFaceSize, mAbsoluteFaceSize),
-                    new Size());
-
-        org.opencv.core.Rect[] facesArray = faces.toArray();
-        for (int i = 0; i < facesArray.length; i++) {
-            Core.rectangle(mRgba, facesArray[i].tl(), facesArray[i].br(),
-                    FACE_RECT_COLOR, 3);
-            xCenter = (facesArray[i].x + facesArray[i].width + facesArray[i].x) / 2;
-            yCenter = (facesArray[i].y + facesArray[i].y + facesArray[i].height) / 2;
-            Point center = new Point(xCenter, yCenter);
-
-            Core.circle(mRgba, center, 10, new Scalar(255, 0, 0, 255), 3);
-
-            Core.putText(mRgba, "[" + center.x + "," + center.y + "]",
-                    new Point(center.x + 20, center.y + 20),
-                    Core.FONT_HERSHEY_SIMPLEX, 0.7, new Scalar(255, 255, 255,
-                            255));
-
-            org.opencv.core.Rect r = facesArray[i];
-            // compute the eye area
-            Rect eyearea = new Rect(r.x + r.width / 8,
-                    (int) (r.y + (r.height / 4.5)), r.width - 2 * r.width / 8,
-                    (int) (r.height / 3.0));
-            // split it
-            org.opencv.core.Rect eyearea_right = new org.opencv.core.Rect(r.x + r.width / 16,
-                    (int) (r.y + (r.height / 4.5)),
-                    (r.width - 2 * r.width / 16) / 2, (int) (r.height / 3.0));
-            org.opencv.core.Rect eyearea_left = new org.opencv.core.Rect(r.x + r.width / 16
-                    + (r.width - 2 * r.width / 16) / 2,
-                    (int) (r.y + (r.height / 4.5)),
-                    (r.width - 2 * r.width / 16) / 2, (int) (r.height / 3.0));
-            // draw the area - mGray is working grayscale mat, if you want to
-            // see area in rgb preview, change mGray to mRgba
-            Core.rectangle(mRgba, eyearea_left.tl(), eyearea_left.br(),
-                    new Scalar(255, 0, 0, 255), 2);
-            Core.rectangle(mRgba, eyearea_right.tl(), eyearea_right.br(),
-                    new Scalar(255, 0, 0, 255), 2);
-
-            if (learn_frames < 5) {
-                teplateR = get_template(mJavaDetectorEye, eyearea_right, 24);
-                teplateL = get_template(mJavaDetectorEye, eyearea_left, 24);
-                learn_frames++;
-            } else {
-                // Learning finished, use the new templates for template
-                // matching
-                match_eye(eyearea_right, teplateR, method);
-                match_eye(eyearea_left, teplateL, method);
-
-            }
-
-
-            // cut eye areas and put them to zoom windows
-            Imgproc.resize(mRgba.submat(eyearea_left), mZoomWindow2,
-                    mZoomWindow2.size());
-            Imgproc.resize(mRgba.submat(eyearea_right), mZoomWindow,
-                    mZoomWindow.size());
-
-
-        }
-
-        return mRgba;
+        return inputFrame.rgba();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.i(TAG, "called onCreateOptionsMenu");
-        mItemFace50 = menu.add("Face size 50%");
-        mItemFace40 = menu.add("Face size 40%");
-        mItemFace30 = menu.add("Face size 30%");
-        mItemFace20 = menu.add("Face size 20%");
-        mItemType = menu.add(mDetectorName[mDetectorType]);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
-        if (item == mItemFace50)
-            setMinFaceSize(0.5f);
-        else if (item == mItemFace40)
-            setMinFaceSize(0.4f);
-        else if (item == mItemFace30)
-            setMinFaceSize(0.3f);
-        else if (item == mItemFace20)
-            setMinFaceSize(0.2f);
-        else if (item == mItemType) {
-            int tmpDetectorType = (mDetectorType + 1) % mDetectorName.length;
-            item.setTitle(mDetectorName[tmpDetectorType]);
-        }
-        return true;
-    }
-
-    private void setMinFaceSize(float faceSize) {
-        mRelativeFaceSize = faceSize;
-        mAbsoluteFaceSize = 0;
-    }
-
-
-    private void CreateAuxiliaryMats() {
-        if (mGray.empty())
-            return;
-
-        int rows = mGray.rows();
-        int cols = mGray.cols();
-
-        if (mZoomWindow == null) {
-            mZoomWindow = mRgba.submat(rows / 2 + rows / 10, rows, cols / 2
-                    + cols / 10, cols);
-            mZoomWindow2 = mRgba.submat(0, rows / 2 - rows / 10, cols / 2
-                    + cols / 10, cols);
-        }
+    private Point subsractPoint(Point v1, Point v2){
+        double v1x = v1.x - v2.x;
+        double v1y = v1.y - v2.y;
+        return new Point(v1x, v1y);
 
     }
 
-    private void match_eye(org.opencv.core.Rect area, Mat mTemplate, int type) {
-        Point matchLoc;
-        Mat mROI = mGray.submat(area);
-        int result_cols = mROI.cols() - mTemplate.cols() + 1;
-        int result_rows = mROI.rows() - mTemplate.rows() + 1;
-        // Check for bad template size
-        if (mTemplate.cols() == 0 || mTemplate.rows() == 0) {
-            return ;
+    private float perimeter(List<Point> v){
+        float peri = 0;
+        for (int i=0; i<v.size(); i++){
+            peri += euqlDist(v.get(i),v.get((i+1)%4));
         }
-        Mat mResult = new Mat(result_cols, result_rows, CvType.CV_8U);
-
-        switch (type) {
-            case TM_SQDIFF:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult, Imgproc.TM_SQDIFF);
-                break;
-            case TM_SQDIFF_NORMED:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult,
-                        Imgproc.TM_SQDIFF_NORMED);
-                break;
-            case TM_CCOEFF:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult, Imgproc.TM_CCOEFF);
-                break;
-            case TM_CCOEFF_NORMED:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult,
-                        Imgproc.TM_CCOEFF_NORMED);
-                break;
-            case TM_CCORR:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult, Imgproc.TM_CCORR);
-                break;
-            case TM_CCORR_NORMED:
-                Imgproc.matchTemplate(mROI, mTemplate, mResult,
-                        Imgproc.TM_CCORR_NORMED);
-                break;
-        }
-
-        Core.MinMaxLocResult mmres = Core.minMaxLoc(mResult);
-        // there is difference in matching methods - best match is max/min value
-        if (type == TM_SQDIFF || type == TM_SQDIFF_NORMED) {
-            matchLoc = mmres.minLoc;
-        } else {
-            matchLoc = mmres.maxLoc;
-        }
-
-        Point matchLoc_tx = new Point(matchLoc.x + area.x, matchLoc.y + area.y);
-        Point matchLoc_ty = new Point(matchLoc.x + mTemplate.cols() + area.x,
-                matchLoc.y + mTemplate.rows() + area.y);
-
-        Core.rectangle(mRgba, matchLoc_tx, matchLoc_ty, new Scalar(255, 255, 0,
-                255));
-        org.opencv.core.Rect rec = new org.opencv.core.Rect(matchLoc_tx,matchLoc_ty);
-
-
+        return peri;
     }
 
-    private Mat get_template(CascadeClassifier clasificator, org.opencv.core.Rect area, int size) {
-        Mat template = new Mat();
-        Mat mROI = mGray.submat(area);
-        MatOfRect eyes = new MatOfRect();
-        Point iris = new Point();
-        org.opencv.core.Rect eye_template = new org.opencv.core.Rect();
-        clasificator.detectMultiScale(mROI, eyes, 1.15, 2,
-                Objdetect.CASCADE_FIND_BIGGEST_OBJECT
-                        | Objdetect.CASCADE_SCALE_IMAGE, new Size(30, 30),
-                new Size());
-
-        org.opencv.core.Rect[] eyesArray = eyes.toArray();
-        for (int i = 0; i < eyesArray.length;) {
-            org.opencv.core.Rect e = eyesArray[i];
-            e.x = area.x + e.x;
-            e.y = area.y + e.y;
-            org.opencv.core.Rect eye_only_rectangle = new org.opencv.core.Rect((int) e.tl().x,
-                    (int) (e.tl().y + e.height * 0.4), (int) e.width,
-                    (int) (e.height * 0.6));
-            mROI = mGray.submat(eye_only_rectangle);
-            Mat vyrez = mRgba.submat(eye_only_rectangle);
-
-
-            Core.MinMaxLocResult mmG = Core.minMaxLoc(mROI);
-
-            Core.circle(vyrez, mmG.minLoc, 2, new Scalar(255, 255, 255, 255), 2);
-            iris.x = mmG.minLoc.x + eye_only_rectangle.x;
-            iris.y = mmG.minLoc.y + eye_only_rectangle.y;
-            eye_template = new org.opencv.core.Rect((int) iris.x - size / 2, (int) iris.y
-                    - size / 2, size, size);
-            Core.rectangle(mRgba, eye_template.tl(), eye_template.br(),
-                    new Scalar(255, 0, 0, 255), 2);
-            template = (mGray.submat(eye_template)).clone();
-            return template;
-        }
-        return template;
+    private float euqlDist(Point a, Point b){
+        double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
+        return (float) res;
     }
 
-    public void onRecreateClick(View v)
-    {
-        learn_frames = 0;
-    }
+
 }
+
+/*       *//* convert bitmap to mat *//*
+        Mat mat = mGray;
+        Mat grayMat = new Mat(mGray.cols(), mGray.rows(), CvType.CV_8UC1);
+
+
+
+*//* convert to grayscale *//*
+        int colorChannels = (mat.channels() == 3) ? Imgproc.COLOR_BGR2GRAY
+                : ((mat.channels() == 4) ? Imgproc.COLOR_BGRA2GRAY : 1);
+
+        Imgproc.cvtColor(mat, grayMat, colorChannels);
+
+*//* reduce the noise so we avoid false circle detection *//*
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(9, 9), 2, 2);
+
+// accumulator value
+        double dp = 1.2d;
+// minimum distance between the center coordinates of detected circles in pixels
+        double minDist = 100;
+
+// min and max radii (set these values as you desire)
+        int minRadius = 0, maxRadius = 0;
+
+// param1 = gradient value used to handle edge detection
+// param2 = Accumulator threshold value for the
+// cv2.CV_HOUGH_GRADIENT method.
+// The smaller the threshold is, the more circles will be
+// detected (including false circles).
+// The larger the threshold is, the more circles will
+// potentially be returned.
+        double param1 = 70, param2 = 72;
+
+*//* create a Mat object to store the circles detected *//*
+        Mat circles = new Mat();
+
+*//* find the circle in the image *//*
+        Imgproc.HoughCircles(grayMat, circles,
+                Imgproc.CV_HOUGH_GRADIENT, dp, minDist, param1,
+                param2, minRadius, maxRadius);
+
+*//* get the number of circles detected *//*
+        int numberOfCircles = (circles.rows() == 0) ? 0 : circles.cols();
+
+*//* draw the circles found on the image *//*
+        for (int i=0; i<numberOfCircles; i++) {
+
+
+*//* get the circle details, circleCoordinates[0, 1, 2] = (x,y,r)
+ * (x,y) are the coordinates of the circle's center
+ *//*
+            double[] circleCoordinates = circles.get(0, i);
+
+
+            int x = (int) circleCoordinates[0], y = (int) circleCoordinates[1];
+
+            Point center = new Point(x, y);
+
+            int radius = (int) circleCoordinates[2];
+
+    *//* circle's outline *//*
+            Core.circle(mat, center, radius, new Scalar(0,
+                    255, 0), 4);
+
+    *//* circle's center outline *//*
+            Core.rectangle(mat, new Point(x - 5, y - 5),
+                    new Point(x + 5, y + 5),
+                    new Scalar(0, 128, 255), -1);
+        }
+
+*//* convert back to bitmap */
