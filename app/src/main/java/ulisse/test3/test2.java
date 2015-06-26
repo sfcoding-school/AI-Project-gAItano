@@ -32,6 +32,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static org.opencv.highgui.Highgui.imread;
 
@@ -136,7 +137,7 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
 
         Mat circles = new Mat();
 
-        Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows()/8, 100, 20, 0, 0);
+        Imgproc.HoughCircles(red_hue_image, circles, Imgproc.CV_HOUGH_GRADIENT, 1, red_hue_image.rows() / 8, 100, 20, 0, 0);
 
 
 
@@ -159,7 +160,7 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
 
                 int radius = (int) circleCoordinates[2];
                 Core.circle(veryOriginal, center, radius, new Scalar(0, 255, 0), 4);
-
+                
                 Core.rectangle(veryOriginal, new Point(x - 5, y - 5),
                         new Point(x + 5, y + 5),
                         new Scalar(0, 128, 255), -1);
@@ -168,6 +169,27 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
             } else {
                 Log.e("trovaCerchi", "NON HO TROVATO NIENTE");
             }
+        }
+
+        if (proviamoAfareIlTriangolo.size()==3) {
+            float[] dis = new float[3];
+            float Max = 0;
+            for (int i = 0; i < proviamoAfareIlTriangolo.size(); i++) {
+                dis[i] = euqlDist(proviamoAfareIlTriangolo.get(i), proviamoAfareIlTriangolo.get((i + 1) % 3));
+                Max = max(dis[i],Max);
+            }
+
+            Log.e("Max", "l'ipotenusa è:" +Max);
+
+            for (int i = 0; i < proviamoAfareIlTriangolo.size(); i++) {
+                if(dis[i]!=Max) {
+                    Core.line(veryOriginal, proviamoAfareIlTriangolo.get(i), proviamoAfareIlTriangolo.get((i + 1) % 3), new Scalar(0, 0, 255));
+                    //euqlDist(proviamoAfareIlTriangolo.get(i), proviamoAfareIlTriangolo.get((i + 1) % 3));
+                }
+            }
+
+        }else {
+            Log.e("trovaCerchi", "Non sono 3 punti");
         }
 
 
@@ -217,7 +239,8 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        Imgproc.cvtColor(inputFrame.rgba(), mGray, Imgproc.COLOR_RGB2HSV);
+        Imgproc.medianBlur(inputFrame.rgba(),mGray,3);
+        Imgproc.cvtColor(mGray, mGray, Imgproc.COLOR_RGB2HSV);
 
         //Imgproc.cvtColor(inputFrame.rgba(), mOrig, Imgproc.COLOR_RGB2HSV);
 
@@ -244,6 +267,12 @@ public class test2 extends Activity implements CameraBridgeViewBase.CvCameraView
     private float euqlDist(Point a, Point b){
         double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
         return (float) res;
+    }
+
+    private String makePosition(float dis1){
+       // if (dis1)
+
+    return "pippo";
     }
 
 

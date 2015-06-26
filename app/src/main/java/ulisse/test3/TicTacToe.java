@@ -62,7 +62,7 @@ import static org.opencv.highgui.Highgui.imread;
 public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
     @Override
     public void onCameraViewStarted(int width, int height) {
-        
+
     }
 
     @Override
