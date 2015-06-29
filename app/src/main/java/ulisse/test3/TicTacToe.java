@@ -56,34 +56,22 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import ulisse.test3.MarkerDet.CameraParameters;
+import ulisse.test3.MarkerDet.Marker;
+import ulisse.test3.MarkerDet.MarkerDetector;
+
 import static org.opencv.highgui.Highgui.imread;
 
 
 public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
-    @Override
-    public void onCameraViewStarted(int width, int height) {
 
-    }
 
-    @Override
-    public void onCameraViewStopped() {
-
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return null;
-    }
-}
-
-/*
-    */
-/*
     private Mat mIntermediateMat;
     private Mat mGray;
+    private Mat frameCapture;
     Mat hierarchy;
     List<MatOfPoint> contours;
-    List<Marker> MarkerList;
+    //List<Marker> MarkerList;
     List<Point> m_markerCorner;
     Button button;
     ImageView test;
@@ -127,13 +115,14 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         Log.i("PROVA tag 2", "called onCreate");
         super.onCreate(savedInstanceState);
 
+        /*
         MarkerList = new ArrayList<Marker>();
         m_markerCorner = new ArrayList<>();
         m_markerCorner.add(new Point(0,0));
         m_markerCorner.add(new Point(6,0));
         m_markerCorner.add(new Point(6,6));
         m_markerCorner.add(new Point(0,6));
-
+*/
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_tic_tac_toe);
@@ -147,6 +136,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             @Override
             public void onClick(View arg0) {
                doSomething();
+
             }
 
         });
@@ -155,14 +145,40 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
     private void doSomething() {
-        MarkerList.clear();
+        MarkerDetector A = new MarkerDetector();
+        CameraParameters mCamParam = new CameraParameters();
+        float markerSizeMeters = 0.034f;
+
+
+
+        Vector<Marker> MarkerDetected= new Vector<Marker>();
+
+        A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
+
+        if (MarkerDetected.size() != 0 ){
+            Log.e("nMarker","Sono esattamente:"+MarkerDetected.size());
+        }else{
+            Log.e("nMarker","Nun ce sò");
+        }
+
+        //Bitmap bm = Bitmap.createBitmap(MarkerDetected.cols(),MarkerDetected.rows(), Bitmap.Config.ARGB_8888);
+        //Utils.matToBitmap(A, bm);
+        //bm = Bitmap.createScaledBitmap(bm,120,120,false);
+        //test.setImageBitmap(bm);
+
+
+
+    }
+
+    /*
+        //MarkerList.clear();
         Mat frameCapture = mGray.clone();
 
         Imgproc.Canny(frameCapture, mIntermediateMat, 80, 100);
         Imgproc.findContours(mIntermediateMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         Imgproc.drawContours(frameCapture, contours, -1, new Scalar(Math.random() * 255, Math.random() * 255, Math.random() * 255)); //, 2, 8, hierarchy, 0, new Point())
 
-
+        /*
         List<MatOfPoint2f> newContours = new ArrayList<>();
         List<MatOfPoint2f> approxContours = new ArrayList<>();
         List<Point> approxPoints = new ArrayList<Point>();
@@ -389,7 +405,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
 
-
+*/
     @Override
     public void onPause() {
         super.onPause();
@@ -413,6 +429,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     public void onCameraViewStarted(int width, int height) {
         mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
         mGray = new Mat(height, width, CvType.CV_8UC1);
+        frameCapture = new Mat(height, width, CvType.CV_8UC1);
         hierarchy = new Mat();
     }
 
@@ -427,19 +444,38 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         //Nuova
         Imgproc.cvtColor(inputFrame.rgba(),mGray,Imgproc.COLOR_RGB2GRAY);
         Imgproc.adaptiveThreshold(mGray,mGray,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,7,7);
-        //Vecchia
-        //Imgproc.threshold(inputFrame.gray(), inputFrame.gray(), 127, 255, Imgproc.THRESH_TOZERO);
+
         contours = new ArrayList<MatOfPoint>();
         hierarchy = new Mat();
         //mGray = inputFrame.gray();
 
 
+        frameCapture = inputFrame.rgba();
+
+        double thresParam1, thresParam2;
+
+        Mat grey, thres, thres2, hierarchy2;
+        List<MatOfPoint> contours2;
+        MatOfPoint mIntermediateMat;
+
+        thresParam1 = thresParam2 = 7;
+
+        grey = new MatOfPoint();
+        thres = new Mat();
+        thres2 = new Mat();
+        hierarchy2 = new Mat();
+        contours2 = new ArrayList<>();
+        mIntermediateMat = new MatOfPoint();
+
+        Imgproc.cvtColor(inputFrame.rgba(), mGray, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.adaptiveThreshold(mGray, thres, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV, (int) thresParam1, thresParam2);
+        Imgproc.findContours(thres, contours2, hierarchy2, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+        Mat frameDebug = new Mat();
+        Imgproc.drawContours(mGray, contours2, -1, new Scalar(255, 0, 0), 2);
 
 
 
 
-
-        */
 /*
 
         MatOfKeyPoint points = new MatOfKeyPoint();
@@ -463,9 +499,9 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.markers));
         Mat matrix2 = imread("markers.jpg", 0);
         fast.detect(matrix2, marker_points);
-        *//*
 
 
+*/
 
         return mGray;
     }
@@ -538,48 +574,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
 
-    public static void warp(Mat in, Mat out, Size size, Vector<Point> points){
-        Mat pointsIn = new Mat(4,1,CvType.CV_32FC2);
-        Mat pointsRes = new Mat(4,1,CvType.CV_32FC2);
-        pointsIn.put(0,0, points.get(0).x,points.get(0).y,
-                points.get(1).x,points.get(1).y,
-                points.get(2).x,points.get(2).y,
-                points.get(3).x,points.get(3).y);
-        pointsRes.put(0, 0, 0, 0,
-                size.width - 1, 0,
-                size.width - 1, size.height - 1,
-                0, size.height - 1);
-        Mat m = new Mat();
-        m = Imgproc.getPerspectiveTransform(pointsIn, pointsRes);
-        Imgproc.warpPerspective(in, out, m, size);
-    }
-
-    public static Mat createMarkerImage(int id,int size) throws CvException {
-        if (id>=1024)
-            throw new CvException("id out of range");
-        Mat marker = new Mat(size,size, CvType.CV_8UC1, new Scalar(0));
-        //for each line, create
-        int swidth=size/7;
-        int ids[]={0x10,0x17,0x09,0x0e};
-        for (int y=0;y<5;y++) {
-            int index=(id>>2*(4-y)) & 0x0003;
-            int val=ids[index];
-            for (int x=0;x<5;x++) {
-                Mat roi=marker.submat((x+1)*swidth, (x+2)*swidth,(y+1)*swidth,(y+2)*swidth);// TODO check
-                if ( (( val>>(4-x) ) & 0x0001) != 0 )
-                    roi.setTo(new Scalar(255));
-                else
-                    roi.setTo(new Scalar(0));
-            }
-        }
-        return marker;
-    }
-
-
-
-
-
 
 
 }
-*/
+
