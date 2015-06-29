@@ -189,7 +189,7 @@ public class MarkerDetector {
                     //Log.e("Marker", "ok");
                     int id = marker.calculateMarkerId();
                     //Log.e("Marker", "bordo trovato" + id);
-                    if(id != -1){
+                    if(id ==0){
                         detectedMarkers.add(marker);
                         // rotate the points of the marker so they are always in the same order no matter the camera orientation
                         Collections.rotate(marker, 4-marker.getRotations());

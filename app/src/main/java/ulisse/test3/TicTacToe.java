@@ -66,6 +66,7 @@ import static org.opencv.highgui.Highgui.imread;
 public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
 
+    private List<Marker> MarkerTrovati;
     private Mat mIntermediateMat;
     private Mat mGray;
     private Mat frameCapture;
@@ -130,13 +131,22 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
+        MarkerTrovati = new ArrayList<>();
+
         button = (Button) findViewById(R.id.button12);
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-               doSomething();
+                for (int i=0; i<10;i++) {
+                    if (MarkerTrovati.size() == 2) {
+                        break;
+                    } else {
+                        doSomething();
+                    }
 
+                }
+                stampa();
             }
 
         });
@@ -149,263 +159,25 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         CameraParameters mCamParam = new CameraParameters();
         float markerSizeMeters = 0.034f;
 
-
-
         Vector<Marker> MarkerDetected= new Vector<Marker>();
 
         A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
 
         if (MarkerDetected.size() != 0 ){
-            Log.e("nMarker","Sono esattamente:"+MarkerDetected.size());
+            Log.e("nMarker", "Sono esattamente:" + MarkerDetected.size());
+            for (int i=0; i<MarkerDetected.size(); i++)
+                if (MarkerTrovati.size()==0 ||MarkerTrovati.get(0).findCenter()!=MarkerDetected.get(i).findCenter())
+                MarkerTrovati.add(MarkerDetected.get(i));
         }else{
             Log.e("nMarker","Nun ce sò");
         }
 
-        //Bitmap bm = Bitmap.createBitmap(MarkerDetected.cols(),MarkerDetected.rows(), Bitmap.Config.ARGB_8888);
-        //Utils.matToBitmap(A, bm);
-        //bm = Bitmap.createScaledBitmap(bm,120,120,false);
-        //test.setImageBitmap(bm);
 
 
 
     }
 
-    /*
-        //MarkerList.clear();
-        Mat frameCapture = mGray.clone();
 
-        Imgproc.Canny(frameCapture, mIntermediateMat, 80, 100);
-        Imgproc.findContours(mIntermediateMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
-        Imgproc.drawContours(frameCapture, contours, -1, new Scalar(Math.random() * 255, Math.random() * 255, Math.random() * 255)); //, 2, 8, hierarchy, 0, new Point())
-
-        /*
-        List<MatOfPoint2f> newContours = new ArrayList<>();
-        List<MatOfPoint2f> approxContours = new ArrayList<>();
-        List<Point> approxPoints = new ArrayList<Point>();
-        List<Point> MarkerCandidato;
-        List<Pair> tooNearMarker = new ArrayList<Pair>();
-        List<Marker> MarkerDetected = new ArrayList<>();
-
-        for (int i = 0; i < contours.size(); i++) {
-            if (Imgproc.isContourConvex(contours.get(i))) {
-
-            MatOfPoint2f newPoint = new MatOfPoint2f(contours.get(i).toArray());
-            MatOfPoint2f approxCurve = new MatOfPoint2f();
-            MarkerCandidato = new ArrayList<Point>();
-
-
-            newContours.add(newPoint);
-
-            double eps = (int) newPoint.total() * 0.05;
-
-            Imgproc.approxPolyDP(newPoint, approxCurve, eps, true);
-            Converters.Mat_to_vector_Point(approxCurve, approxPoints);
-
-            //Log.e("testPair", "eps " + String.valueOf(eps) + " approxCurve.total() " + approxCurve.total() );
-            if (approxCurve.total() == 4) {
-                 //riconverto in Mat?
-                    double minDistFound = Double.MAX_VALUE;
-                    // look for the min distance
-                    for (int j = 0; j < 4; j++) {
-                        Point side = subsractPoint(approxPoints.get(j), approxPoints.get((j + 1) % 4));
-                        double sqauredSideLenght = side.dot(side);
-                        minDistFound = Math.min(minDistFound, sqauredSideLenght);
-                    }
-
-
-                    if (minDistFound > 0) {
-                        // create a candidate marker
-                        for (int j = 0; j < 4; j++) {
-                            MarkerCandidato.add(new Point(approxPoints.get(j).x, approxPoints.get(j).y));
-                        }
-                    }
-
-
-                    Point v1 = subsractPoint(MarkerCandidato.get(1), MarkerCandidato.get(0));
-                    Point v2 = subsractPoint(MarkerCandidato.get(2), MarkerCandidato.get(0));
-
-                    double o = (v1.x * v2.y) - (v1.y * v2.x);
-                    if (o < 0.0) {
-                        Point v3 = MarkerCandidato.get(3);
-                        MarkerCandidato.set(3, v1);
-                        MarkerCandidato.set(1, v3);
-                    }
-                    //Log.e("testPair", "aggiungo" + MarkerCandidato);
-                    Marker m1 = new Marker(MarkerCandidato.size());
-                    m1.add(MarkerCandidato.get(0));
-                m1.add(MarkerCandidato.get(1));
-                m1.add(MarkerCandidato.get(2));
-                m1.add(MarkerCandidato.get(3));
-                    MarkerList.add(m1);
-                }
-            }
-        }
-        Log.e("testSize", String.valueOf(MarkerList.size()));
-
-        if (MarkerList.size() > 0) {
-
-            for (int i = 0; i < MarkerList.size(); i++) {
-                List<Point> m1 = MarkerList.get(i);
-                for (int j = i+1; j < MarkerList.size(); j++){
-                    List<Point> m2 = MarkerList.get(j);
-                    float disSquared = 0;
-                    for (int c=0; c<4;c++){
-                        double vX = m1.get(c).x - m2.get(c).x;
-                        double vY = m1.get(c).y - m2.get(c).y;
-                        Point v = new Point(vX,vY);
-                        disSquared += v.dot(v);
-                    }
-                    disSquared /= 4;
-                    if (disSquared<100){
-                        tooNearMarker.add(new Pair(i,j));
-                    }
-                }
-            }
-
-            boolean[] MarkerMask = new boolean[MarkerList.size()];
-            Arrays.fill(MarkerMask, false);
-            //Log.e("testPair", String.valueOf(tooNearMarker.size()));
-            for (int i=0;i<tooNearMarker.size();i++){
-                float p1 = perimeter(MarkerList.get(Integer.parseInt(tooNearMarker.get(i).first.toString())));
-                float p2 = perimeter(MarkerList.get(Integer.parseInt(tooNearMarker.get(i).second.toString())));
-                //Log.e("testPair", tooNearMarker.get(0).first.toString());
-                int removalIndex;
-                if (p1>p2){
-                    removalIndex = Integer.parseInt(tooNearMarker.get(i).second.toString());
-                }else {
-                    removalIndex = Integer.parseInt(tooNearMarker.get(i).first.toString());
-                }
-                MarkerMask[removalIndex] = true;
-            }
-
-            for (int i = 0; i< MarkerList.size(); i++){
-                if (!MarkerMask[i]){
-                    MarkerDetected.add(MarkerList.get(i));
-                }
-            }
-
-        } else {Log.e("testPair","MarkeCandidato è null");}
-
-
-        Mat src = new Mat(4,1,CvType.CV_32FC2);
-        Mat dst = new Mat(4,1,CvType.CV_32FC2);
-
-        Mat m_markerCornerMat = new Mat();
-        //Mat canonicalMarker = new Mat();
-        //Converters.vector_Point_to_Mat(m_markerCorner,m_markerCornerMat);
-
-
-
-
-
-        Mat A = new Mat(5,5,CvType.CV_8UC1,new Scalar(0));
-        //List<Point> prova = new ArrayList<>();
-
-        A.put(0,0,0);A.put(0,1,0);A.put(0,2,0);A.put(0,3,0);A.put(0,4,0);
-        A.put(1,0,0);A.put(1,1,255);A.put(1,2,0);A.put(1,3,0);A.put(1,4,0);
-        A.put(2,0,0);A.put(2,1,0);A.put(2,2,255);A.put(2,3,255);A.put(2,4,0);
-        A.put(3,0,0);A.put(3,1,0);A.put(3,2,255);A.put(3,3,0);A.put(3,4,0);
-        A.put(4,0,0);A.put(4,1,0);A.put(4,2,0);A.put(4,3,0);A.put(4, 4, 0);
-
-        Imgproc.threshold(A, A, 0, 255, Imgproc.THRESH_BINARY);
-
-        List<Marker> detectedMarkers = new ArrayList<>();
-
-        for(int i=0;i<MarkerDetected.size();i++){
-                Marker marker = MarkerDetected.get(i);
-                Mat canonicalMarker = new Mat();
-                TicTacToe.warp(frameCapture, canonicalMarker, new Size(50, 50), marker);
-                marker.setMat(canonicalMarker);
-                marker.extractCode();
-                if(marker.checkBorder()){
-                    int id = marker.calculateMarkerId();
-                    if(id != -1){
-                        detectedMarkers.add(marker);
-                        // rotate the points of the marker so they are always in the same order no matter the camera orientation
-                        Collections.rotate(marker, 4 - marker.getRotations());
-                    }
-                }
-            }
-
-        Collections.sort(detectedMarkers);
-        Vector<Integer> toRemove = new Vector<Integer>();;
-        for(int i=0;i<detectedMarkers.size();i++)
-            toRemove.add(0);
-
-        for(int i=0;i<detectedMarkers.size()-1;i++){
-            if(detectedMarkers.get(i).id == detectedMarkers.get(i+1).id)
-                if(detectedMarkers.get(i).perimeter()<detectedMarkers.get(i+1).perimeter())
-                    toRemove.set(i, 1);
-                else
-                    toRemove.set(i+1, 1);
-        }
-
-        for(int i=toRemove.size()-1;i>=0;i--) {// done in inverse order in case we need to remove more than one element
-            if (toRemove.get(i) == 1)
-                detectedMarkers.remove(i);
-        }
-        // detect the position of markers if desired
-        for(int i=0;i<detectedMarkers.size();i++){
-            detectedMarkers.get(i).calculateExtrinsics(camMatrix, distCoeff, markerSizeMeters);
-        }
-
-
-
-
-
-
-
-    Mat rotation[] = new Mat[4];
-        int distance[] = new int[4];
-
-        rotation[0] = A;
-        distance[0] = 0;
-
-
-
-        for (int i=0; i<MarkerList.size(); i++){
-            List<Point> MarkerProva = MarkerList.get(i);
-
-            src.put(0, 0,   MarkerProva.get(0).x,
-                    MarkerProva.get(0).y,
-                    MarkerProva.get(1).x,
-                    MarkerProva.get(1).y,
-                    MarkerProva.get(2).x,
-                    MarkerProva.get(2).y,
-                    MarkerProva.get(3).x,
-                    MarkerProva.get(3).y);
-            dst.put(0, 0, 0.0, 0.0, 6.0, 0.0, 6.0, 6.0, 0.0, 6.0);
-
-            Mat m = Imgproc.getPerspectiveTransform(src, dst);
-
-            //Imgproc.warpPerspective(frameCapture, canonicalMarker, m, canonicalMarker.size());
-
-            //Imgproc.threshold(canonicalMarker, canonicalMarker, 125, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
-
-        }
-
-           /// Mat bitMatrix = Mat.zeros(5, 5, CvType.CV_8UC1);
-
-
-
-
-
-        //Log.e("bitmap", canonicalMarker.cols() + " " + canonicalMarker.rows());
-        */
-/*Bitmap bm = Bitmap.createBitmap(canonicalMarker.cols(),canonicalMarker.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(canonicalMarker, bm);
-        test.setImageBitmap(bm);*//*
-
-
-        Bitmap bm = Bitmap.createBitmap(A.cols(),A.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(A, bm);
-        bm = Bitmap.createScaledBitmap(bm,120,120,false);
-        test.setImageBitmap(bm);
-
-    }
-
-
-*/
     @Override
     public void onPause() {
         super.onPause();
@@ -442,8 +214,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         //Nuova
-        Imgproc.cvtColor(inputFrame.rgba(),mGray,Imgproc.COLOR_RGB2GRAY);
-        Imgproc.adaptiveThreshold(mGray,mGray,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,7,7);
+        //Imgproc.cvtColor(inputFrame.rgba(),mGray,Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.adaptiveThreshold(mGray,mGray,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,7,7);
 
         contours = new ArrayList<MatOfPoint>();
         hierarchy = new Mat();
@@ -452,7 +224,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
         frameCapture = inputFrame.rgba();
 
-        double thresParam1, thresParam2;
+        /*double thresParam1, thresParam2;
 
         Mat grey, thres, thres2, hierarchy2;
         List<MatOfPoint> contours2;
@@ -473,7 +245,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         Mat frameDebug = new Mat();
         Imgproc.drawContours(mGray, contours2, -1, new Scalar(255, 0, 0), 2);
 
-
+        */
 
 
 /*
@@ -503,7 +275,21 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
 */
 
-        return mGray;
+        return frameCapture;
+    }
+
+
+    private void stampa(){
+        //Mat B = new Mat(frameCapture.cols(), mGray.rows(), CvType.CV_8UC1);
+        Log.e("Marker", " " + MarkerTrovati.size());
+        for (int i=0; i<MarkerTrovati.size(); i++){
+            MarkerTrovati.get(i).draw(frameCapture,new Scalar(255,0,0),10,true);
+        }
+
+        Bitmap bm = Bitmap.createBitmap(frameCapture.cols(),frameCapture.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(frameCapture, bm);
+        //bm = Bitmap.createScaledBitmap(bm,120,120,false);
+        test.setImageBitmap(bm);
     }
 
     private Point subsractPoint(Point v1, Point v2){

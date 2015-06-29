@@ -71,7 +71,17 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
             cent.x/=4.;
             cent.y/=4.;
             Core.putText(in,cad, cent,Core.FONT_HERSHEY_SIMPLEX, 0.5,  color,2);
+
         }
+    }
+
+    public Point findCenter(){
+        Point cent = new Point(0,0);
+        for(int i=0;i<4;i++){
+            cent.x += this.get(i).x;
+            cent.y += this.get(i).y;
+        }
+        return cent;
     }
 
     /**
@@ -257,6 +267,20 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
             }
             dist+=minSum;
         }
+
+//        for(int y=0;y<5;y++){
+//            int minSum = 0;
+//            for(int p=0;p<4;p++){
+//                int sum=0;
+//                for(int x=0;x<5;x++) {
+//                    minSum += code.get(y + 1, x + 1) == ids[p][x] ? 0 : 1;
+//                }
+//                //Log.e("Marker", teest  + " " + teest2);
+//                //minSum = sum<minSum? sum:minSum;
+//
+//            }
+//            dist+=minSum;
+//        }
         return dist;
     }
 
