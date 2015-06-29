@@ -68,9 +68,11 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
                 cent.x += this.get(i).x;
                 cent.y += this.get(i).y;
             }
+
             cent.x/=4.;
             cent.y/=4.;
-            Core.putText(in,cad, cent,Core.FONT_HERSHEY_SIMPLEX, 0.5,  color,2);
+            Log.e("Marker Centro"," " + cent.x + " " + cent.y);
+            Core.putText(in, cad, cent, Core.FONT_HERSHEY_SIMPLEX, 0.5, color,2);
 
         }
     }
@@ -81,6 +83,8 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
             cent.x += this.get(i).x;
             cent.y += this.get(i).y;
         }
+        cent.x/=4;
+        cent.y/=4;
         return cent;
     }
 
@@ -190,13 +194,14 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
                 minDist[1] = i;
             }
         }
-        this.rotations = minDist[1];
+        this.rotations = minDist[1]; //Log.e("Marker","" +minDist[0]);
         if(minDist[0] != 0){
             return -1; // matching id not found
         }
         else{
-            this.id = mat2id(rotations[minDist[1]]);
+            this.id = 0;//mat2id(rotations[minDist[1]]);
         }
+
         return id;
     }
 
@@ -211,7 +216,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
             if(i==0 || i==6)// in first and last row the whole row must be checked
                 inc = 1;
             for(int j=0;j<7;j+=inc)
-                if(code.get(i, j)!=1)
+                if(code.get(i, j)==1)
                     return false;
         }
         return true;
@@ -245,29 +250,40 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
 //                {1,1,0,0,1},
 //                {1,1,0,1,1},
 //                {1,1,1,1,1}
-               {1,0,0,0,1},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,1}
+              // {1,0,0,0,1},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,1}
+                {1,1,1,1,1},{1,0,0,0,1},{1,0,0,0,1},{1,0,0,0,1},{1,1,1,1,1}
         };
         int dist = 0;
 
+//        for(int y=0;y<5;y++){
+//            int minSum = Integer.MAX_VALUE;
+//            // hamming distance to each possible word
+//            for(int p=0;p<4;p++){
+//                int sum=0;
+//                String teest = "";
+//                String teest2 = "";
+//                for(int x=0;x<5;x++) {
+//                    sum += code.get(y + 1, x + 1) == ids[p][x] ? 0 : 1;
+//                    teest += ids[p][x];
+//                    teest2 += code.get(y + 1, x + 1);
+//                }
+//                Log.e("Marker", teest  + " " + teest2);
+//                minSum = sum<minSum? sum:minSum;
+//
+//            }
+//            dist+=minSum;
+//        }
+
         for(int y=0;y<5;y++){
-            int minSum = Integer.MAX_VALUE;
-            // hamming distance to each possible word
-            for(int p=0;p<4;p++){
-                int sum=0;
-                String teest = "";
-                String teest2 = "";
-                for(int x=0;x<5;x++) {
-                    sum += code.get(y + 1, x + 1) == ids[p][x] ? 0 : 1;
-                    teest += ids[p][x];
-                    teest2 += code.get(y + 1, x + 1);
-                }
-                //Log.e("Marker", teest  + " " + teest2);
-                minSum = sum<minSum? sum:minSum;
 
-            }
-            dist+=minSum;
+                for(int x=0;x<5;x++)
+                    if (code.get(y+1,x+1)!=ids[y][x]) {
+                        //Log.e("Marker", "Diverso ");
+                        return -1;
+                    }
         }
-
+        //Log.e("Marker", "Uguale");
+        return 0;
 //        for(int y=0;y<5;y++){
 //            int minSum = 0;
 //            for(int p=0;p<4;p++){
@@ -281,7 +297,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
 //            }
 //            dist+=minSum;
 //        }
-        return dist;
+        //return dist;
     }
 
     private int mat2id(Code code){
