@@ -43,11 +43,6 @@
             android:name=".GiocaActivity"
             android:label="Gioca" >
         </activity>
-        <activity
-            android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden"
-            android:name=".test2"
-            android:label="test" >
-        </activity>
     </application>
 
 </manifest> <!-- android:name=".DeviceListActivity_nonUtilizzata" -->

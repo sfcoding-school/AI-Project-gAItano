@@ -138,6 +138,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
             @Override
             public void onClick(View arg0) {
+                MarkerTrovati.clear();
                 for (int i=0; i<10;i++) {
                     if (MarkerTrovati.size() == 2) {
                         break;
@@ -167,14 +168,10 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             Log.e("nMarker", "Sono esattamente:" + MarkerDetected.size());
             for (int i=0; i<MarkerDetected.size(); i++)
                 if (MarkerTrovati.size()==0 ||MarkerTrovati.get(0).findCenter()!=MarkerDetected.get(i).findCenter())
-                MarkerTrovati.add(MarkerDetected.get(i));
+                    MarkerTrovati.add(MarkerDetected.get(i));
         }else{
             Log.e("nMarker","Nun ce sò");
         }
-
-
-
-
     }
 
 

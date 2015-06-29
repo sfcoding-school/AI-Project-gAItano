@@ -33,14 +33,12 @@ class Board {
 
     public boolean hasXWon() {
         if ((board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] == 1) || (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] == 1)) {
-            //System.out.println("X Diagonal Win");
-            return true;
+          return true;
         }
         for (int i = 0; i < 3; ++i) {
             if (((board[i][0] == board[i][1] && board[i][0] == board[i][2] && board[i][0] == 1)
                     || (board[0][i] == board[1][i] && board[0][i] == board[2][i] && board[0][i] == 1))) {
-                // System.out.println("X Row or Column win");
-                return true;
+               return true;
             }
         }
         return false;
@@ -48,13 +46,11 @@ class Board {
 
     public boolean hasOWon() {
         if ((board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] == 2) || (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] == 2)) {
-            // System.out.println("O Diagonal Win");
-            return true;
+           return true;
         }
         for (int i = 0; i < 3; ++i) {
             if ((board[i][0] == board[i][1] && board[i][0] == board[i][2] && board[i][0] == 2)
                     || (board[0][i] == board[1][i] && board[0][i] == board[2][i] && board[0][i] == 2)) {
-                //  System.out.println("O Row or Column win");
                 return true;
             }
         }
@@ -96,19 +92,30 @@ class Board {
                 int currentScore = minimax(depth + 1, 2);
                 max = Math.max(currentScore, max);
 
-                if(depth == 0)System.out.println("Score for position "+(i+1)+" = "+currentScore);
-                if(currentScore >= 0){ if(depth == 0) computersMove = point;}
-                if(currentScore == 1){board[point.x][point.y] = 0; break;}
-                if(i == pointsAvailable.size()-1 && max < 0){if(depth == 0)computersMove = point;}
+                if (depth == 0)
+                    System.out.println("Score for position " + (i + 1) + " = " + currentScore);
+                if (currentScore >= 0) {
+                    if (depth == 0) computersMove = point;
+                }
+                if (currentScore == 1) {
+                    board[point.x][point.y] = 0;
+                    break;
+                }
+                if (i == pointsAvailable.size() - 1 && max < 0) {
+                    if (depth == 0) computersMove = point;
+                }
             } else if (turn == 2) {
                 placeAMove(point, 2);
                 int currentScore = minimax(depth + 1, 1);
                 min = Math.min(currentScore, min);
-                if(min == -1){board[point.x][point.y] = 0; break;}
+                if (min == -1) {
+                    board[point.x][point.y] = 0;
+                    break;
+                }
             }
             board[point.x][point.y] = 0; //Reset this point
         }
-        return turn == 1?max:min;
+        return turn == 1 ? max : min;
     }
 }
 
@@ -116,25 +123,25 @@ public class TicTacToeMinimax {
 
     private static Board b;
 
-    public static void init_game(){
+    public static void init_game() {
         b = new Board();
     }
 
-    public static void userMove(int row, int column){
+    public static void userMove(int row, int column) {
         b.placeAMove(new Point(row, column), 2);
     }
 
-    public static int[] computerMove(){
+    public static int[] computerMove() {
         b.minimax(0, 1);
         b.placeAMove(b.computersMove, 1);
-        return new int[] {b.computersMove.x, b.computersMove.y};
+        return new int[]{b.computersMove.x, b.computersMove.y};
     }
 
-    public static boolean gameOver(){
+    public static boolean gameOver() {
         return b.isGameOver();
     }
 
-    public static String partitaFinita(){
+    public static String partitaFinita() {
         if (b.hasXWon())
             return "Unfortunately, you lost!";
         else if (b.hasOWon())
@@ -142,42 +149,4 @@ public class TicTacToeMinimax {
         else
             return "It's a draw!";
     }
-
-    /*
-    public static void main(String[] args) {
-        Board b = new Board();
-        Random rand = new Random();
-
-        b.displayBoard();
-
-
-        System.out.println("Select turn:\n\n1. Computer 2. User: ");
-        int choice = b.scan.nextInt();
-        if(choice == 1){
-            Point p = new Point(rand.nextInt(3), rand.nextInt(3));
-            b.placeAMove(p, 1);
-            b.displayBoard();
-        }
-
-
-        while (!b.isGameOver()) {
-            Point userMove = new Point(b.scan.nextInt(), b.scan.nextInt());
-
-            b.placeAMove(userMove, 2); //2 for O and O is the user
-            b.displayBoard();
-            if (b.isGameOver()) break;
-
-            b.minimax(0, 1);
-
-            b.placeAMove(b.computersMove, 1);
-            b.displayBoard();
-        }
-        if (b.hasXWon())
-            System.out.println("Unfortunately, you lost!");
-        else if (b.hasOWon())
-            System.out.println("You win!"); //Can't happen
-        else
-            System.out.println("It's a draw!");
-    }
-*/
 }
