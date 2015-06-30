@@ -27,10 +27,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/layout_choice">
+            android:id="@+id/layout_choice"
+            android:gravity="center_horizontal">
 
             <Button
                 android:layout_width="wrap_content"
@@ -42,9 +43,15 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TicTacToe"
+                android:text="MarkerDetection"
                 android:id="@+id/b_project"
                 android:gravity="center_horizontal" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="QRCode"
+                android:id="@+id/button22" />
 
             <Button
                 android:layout_width="wrap_content"
