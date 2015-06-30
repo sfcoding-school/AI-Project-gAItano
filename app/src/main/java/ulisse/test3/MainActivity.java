@@ -94,20 +94,6 @@ public class MainActivity extends Activity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
-                Log.e("QR", contents);
-            } else
-            if (resultCode == RESULT_CANCELED) {
-                Log.e("QR", "RESULT_CANCELED");
-            }
-        }
-    }
-
     private void showGiocaActivity() {
         GiocaActivity.show(this);
     }

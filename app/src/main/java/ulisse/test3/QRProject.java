@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -47,6 +48,20 @@ public class QRProject extends Activity {
 
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
+                Log.e("QR", contents);
+            } else
+            if (resultCode == RESULT_CANCELED) {
+                Log.e("QR", "RESULT_CANCELED");
+            }
+        }
     }
 
     static void show(Context context, UsbSerialPort port) {
