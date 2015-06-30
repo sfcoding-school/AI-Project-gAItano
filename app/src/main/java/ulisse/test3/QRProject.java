@@ -30,24 +30,28 @@ public class QRProject extends Activity {
             @Override
             public void onClick(View arg0) {
 
-                try {
-
-                    Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-                    intent.putExtra("SAVE_HISTORY", false);
-                    intent.putExtra("RESULT_DISPLAY_DURATION_MS", 10);
-                    startActivityForResult(intent, 0);
-
-                } catch (ActivityNotFoundException e) { //se l'app non fosse installata
-                    Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                    startActivity(marketIntent);
-                }
+               qrCerca();
 
             }
 
         });
 
+    }
+
+    private void qrCerca(){
+        try {
+
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+            intent.putExtra("SAVE_HISTORY", false);
+            intent.putExtra("RESULT_DISPLAY_DURATION_MS", 10);
+            startActivityForResult(intent, 0);
+
+        } catch (ActivityNotFoundException e) { //se l'app non fosse installata
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            startActivity(marketIntent);
+        }
     }
 
     @Override
@@ -57,16 +61,11 @@ public class QRProject extends Activity {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
                 Log.e("QR", contents);
+                qrCerca();
             } else
             if (resultCode == RESULT_CANCELED) {
                 Log.e("QR", "RESULT_CANCELED");
             }
         }
-    }
-
-    static void show(Context context, UsbSerialPort port) {
-        final Intent intent = new Intent(context, QRProject.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        context.startActivity(intent);
     }
 }

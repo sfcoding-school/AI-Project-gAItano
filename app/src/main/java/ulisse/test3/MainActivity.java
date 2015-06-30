@@ -141,7 +141,9 @@ public class MainActivity extends Activity {
 
     private void showQRActivity() {
         //if (port != null) //da rimettere !!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        QRProject.show(this, port);
+        Intent intent = new Intent(this, QRProject.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showTicTacToe() {
