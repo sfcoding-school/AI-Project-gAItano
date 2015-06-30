@@ -154,8 +154,8 @@ public class MainActivity extends Activity {
     }
 
     private void showQRActivity() {
-        if (port != null)
-            QRProject.show(this, port);
+        //if (port != null) //da rimettere !!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        QRProject.show(this, port);
     }
 
     private void showTicTacToe() {

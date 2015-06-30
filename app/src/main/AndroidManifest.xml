@@ -43,6 +43,10 @@
             android:name=".GiocaActivity"
             android:label="Gioca" >
         </activity>
+        <activity
+            android:name=".QRProject"
+            android:label="QRProject" >
+        </activity>
     </application>
 
 </manifest> <!-- android:name=".DeviceListActivity_nonUtilizzata" -->
