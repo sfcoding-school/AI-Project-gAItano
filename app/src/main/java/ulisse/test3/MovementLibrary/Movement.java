@@ -29,14 +29,14 @@ public class Movement extends MovementHex {
 
     private final String TAG = "MovementClass";
 
-    private static UsbSerialPort sPort = null;
+    public static UsbSerialPort sPort = null;
     private static Context context = null;
     private boolean serialOk = false;
     private SerialInputOutputManager mSerialIoManager;
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     public Movement(Context context_temp, UsbSerialPort sPort_temp){
-        sPort = sPort_temp;
+        //sPort = sPort_temp;
         context = context_temp;
     }
 

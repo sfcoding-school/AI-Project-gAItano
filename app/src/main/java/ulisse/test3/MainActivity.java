@@ -1,11 +1,9 @@
 package ulisse.test3;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +27,7 @@ public class MainActivity extends Activity {
     private ProgressBar mProgressBar;
     private UsbManager mUsbManager;
     private List<UsbSerialPort> mEntries = new ArrayList<>();
-    private UsbSerialPort port = null;
+    private static UsbSerialPort port = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +114,8 @@ public class MainActivity extends Activity {
                     port = mEntries.get(0);
                     layout_init.setVisibility(View.GONE);
                     layout_choice.setVisibility(View.VISIBLE);
+                    Log.e("settoPorta", String.valueOf(port));
+                    Movement.sPort = port;
                 } else {
                     port = null;
                     refreshDeviceList();
@@ -150,5 +150,9 @@ public class MainActivity extends Activity {
         //if (port != null)
         TicTacToe.show(this, port);
         //test2.show(this, port);
+    }
+
+    public static UsbSerialPort getPort(){
+        return port;
     }
 }
