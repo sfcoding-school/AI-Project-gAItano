@@ -37,7 +37,18 @@ public class MainActivity extends Activity {
 
         initLayout();
         //layout_choice.setVisibility(LinearLayout.GONE);
-        refreshDeviceList();
+        //refreshDeviceList();
+
+        Intent serviceIntent = new Intent(ServiceMovimento.class.getName());
+        startService(serviceIntent);
+
+        Intent intent=new Intent(ServiceMovimento.class.getName());
+        Bundle b=new Bundle();
+        b.putString("Array", "ciao");
+        intent.putExtras(b);
+        startService(intent);
+
+
 
     }
 
@@ -96,7 +107,7 @@ public class MainActivity extends Activity {
         GiocaActivity.show(this);
     }
 
-    private void refreshDeviceList() {
+/*    private void refreshDeviceList() {
         showProgressBar();
 
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
@@ -114,8 +125,8 @@ public class MainActivity extends Activity {
                     port = mEntries.get(0);
                     layout_init.setVisibility(View.GONE);
                     layout_choice.setVisibility(View.VISIBLE);
-                    Log.e("settoPorta", String.valueOf(port));
-                    Movement.sPort = port;
+                    Log.e("settoPorta1", String.valueOf(port));
+                    //Movement.sPort = port;
                 } else {
                     port = null;
                     refreshDeviceList();
@@ -124,16 +135,16 @@ public class MainActivity extends Activity {
             }
 
         }.execute((Void) null);
-    }
+    }*/
 
-    private void showProgressBar() {
+   /* private void showProgressBar() {
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void hideProgressBar() {
         mProgressBar.setVisibility(View.INVISIBLE);
     }
-
+*/
     private void showConsoleActivity() {
        if (port != null)
             GestionMovimentoUI.show(this, port);

@@ -25,11 +25,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.util.HexDump;
+import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import ulisse.test3.MovementLibrary.Movement;
 
@@ -40,14 +45,16 @@ public class GestionMovimentoUI extends Activity {
     Movement movementClass;
     private boolean headTest = false;
     private boolean headTestLR = false;
+    TextView mDumpTextView;
+    ScrollView mScrollView;
 
-/*
+
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
 
                 @Override
                 public void onRunError(Exception e) {
-                    Log.d(TAG, "Runner stopped.");
+                    Log.d("GestionMovimentoUI", "Runner stopped.");
                 }
 
                 @Override
@@ -66,7 +73,7 @@ public class GestionMovimentoUI extends Activity {
                 + HexDump.dumpHexString(data) + "\n\n";
         mDumpTextView.append(message);
         mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
-    }*/
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,10 +82,12 @@ public class GestionMovimentoUI extends Activity {
 
         setContentView(R.layout.movement);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //mDumpTextView = (TextView) findViewById(R.id.consoleText);
-        //mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+        mDumpTextView = (TextView) findViewById(R.id.consoleText);
+        mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
         movementClass = new Movement(getApplicationContext(), sPort);
+
+
 
         Button button_wakeUP = (Button) findViewById(R.id.button9);
         Button button_moveForward = (Button) findViewById(R.id.button2);
@@ -101,7 +110,7 @@ public class GestionMovimentoUI extends Activity {
             @Override
             public void onClick(View arg0) {
 
-                    movementClass.executeCommand("test2");
+                    movementClass.executeCommand("testV");
 
             }
         });
@@ -220,7 +229,7 @@ public class GestionMovimentoUI extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        movementClass.init_connection();
+        movementClass.init_connection(/*mListener*/);
     }
 
     static void show(Context context, UsbSerialPort port) {

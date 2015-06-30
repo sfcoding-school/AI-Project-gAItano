@@ -51,6 +51,10 @@ public class MovementHex {
 
         //inclina il corpo di 118 (parte davanti verso l'alto)
         put("test2","0x7e074276000000000047");
+
+        //
+        //put("PipForward", "0x7e044d001000a2"); //movimento avanti tramite PIP di "unità" 10 su 127
+        put("testV", "0x7e017689");
     }};
 
     public byte[] returnCommand(String command){

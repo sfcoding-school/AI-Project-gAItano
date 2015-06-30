@@ -36,11 +36,13 @@ public class Movement extends MovementHex {
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     public Movement(Context context_temp, UsbSerialPort sPort_temp){
-        //sPort = sPort_temp;
+        Log.e("settoPorta3", String.valueOf(sPort_temp));
+        sPort = sPort_temp;
+        Log.e("settoPorta4", String.valueOf(sPort));
         context = context_temp;
     }
 
-    public void init_connection() {
+    public void init_connection(/*SerialInputOutputManager.Listener mListener*/) {
         Log.e(TAG, "Resumed, port=" + sPort);
 
         if (sPort == null) {
@@ -58,6 +60,7 @@ public class Movement extends MovementHex {
                 sPort.open(connection);
                 sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
                 serialOk = true;
+                //startIoManager(mListener);
             } catch (IOException e) {
                 Log.e(TAG, "onResume: Error opening device: " + e.getMessage());
                 serialOk = false;
@@ -71,7 +74,7 @@ public class Movement extends MovementHex {
             }
             Log.e(TAG, "onResume: Serial device: " + sPort.getClass().getSimpleName());
         }
-        onDeviceStateChange();
+        //onDeviceStateChange();
     }
 
     private void stopIoManager() {
@@ -94,22 +97,23 @@ public class Movement extends MovementHex {
         }
     }
 
-    public void startIoManager() {
+    public void startIoManager(SerialInputOutputManager.Listener mListener) {
         if (sPort != null) {
             Log.e(TAG, "Starting io manager ..");
-            mSerialIoManager = new SerialInputOutputManager(sPort, null);//mListener);
+            mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
             mExecutor.submit(mSerialIoManager);
         }
     }
 
-    public void onDeviceStateChange() {
+    public void onDeviceStateChange(SerialInputOutputManager.Listener mListener) {
         stopIoManager();
-        startIoManager();
+        startIoManager(mListener);
     }
 
 
 
     public void executeCommand(String comando){
+        Log.e("settoPorta6", String.valueOf(sPort));
         if (serialOk) {
             try {
                 sPort.write(returnCommand(comando), 200);

@@ -17,6 +17,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
 
 import ulisse.test3.MovementLibrary.Movement;
 
@@ -36,11 +37,14 @@ public class QRProject extends Activity {
 
         buttonAvvio = (Button) findViewById(R.id.b_avvio);
 
+
+
         sPort = MainActivity.getPort();
         if (sPort == null)
             Toast.makeText(getApplicationContext(), "sPort è NULL",
                     Toast.LENGTH_SHORT).show();
         else {
+            Log.e("settoPorta2", String.valueOf(sPort));
             movementClass = new Movement(getApplicationContext(), sPort);
         }
 
@@ -89,10 +93,15 @@ public class QRProject extends Activity {
                 String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
                 Log.e("QR", contents);
                 myQ.add(contents);
-                if (myQ.size() > 0 && gestioneCodaMovimento.getStatus() != AsyncTask.Status.RUNNING){
-                    Void[] param = null;
-                    gestioneCodaMovimento.execute(param);
-                }
+                Void[] param = null;
+
+
+                    if (gestioneCodaMovimento.getStatus() != AsyncTask.Status.RUNNING){
+                        gestioneCodaMovimento.execute(param);
+                        Log.e("QR", "async partito");
+                    }
+
+
                 qrCerca();
             } else
             if (resultCode == RESULT_CANCELED) {
@@ -101,18 +110,7 @@ public class QRProject extends Activity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(movementClass != null) movementClass.pauseActivity();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(movementClass != null) movementClass.init_connection();
-    }
+    boolean prima = true;
 
     final AsyncTask gestioneCodaMovimento = new AsyncTask<Void, Void, Void>() {
 
@@ -123,16 +121,33 @@ public class QRProject extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            while (myQ.size() > 0) {
+            int time = 5000;
+            while (true) {
                 if (sPort != null && movementClass != null) {
-                    movementClass.executeCommand(myQ.poll());
+                    Log.e("asynctask1", sPort + " " + movementClass);
+                    Log.e("asynctask2", String.valueOf(myQ.size()));
+                    if (myQ.size()>0){
+                        String comand = myQ.poll();
+                        Log.e("asynctask3", comand);
+                        if (comand.equals("wakeUP")){
+                            time = 15000;
+                            movementClass.executeCommand(comand);
+                            Log.e("asynctask4", "a");
+                        } else{
+                            time = 15000;
+                            movementClass.executeCommand(comand);
+                            if (prima){movementClass.executeCommand(comand); prima=false;}
+                            Log.e("asynctask5", "a");
+                        }
 
+
+                    }
                 } else {
                     Log.e("asynctask", sPort + " " + movementClass);
+                    return null;
                 }
-                SystemClock.sleep(5000);
+                SystemClock.sleep(time);
             }
-            return null;
         }
 
         @Override
