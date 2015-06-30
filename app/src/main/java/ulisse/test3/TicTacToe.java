@@ -133,23 +133,23 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         MarkerTrovati = new ArrayList<>();
 
         button = (Button) findViewById(R.id.button12);
-//        button.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View arg0) {
-//                MarkerTrovati.clear();
-//                for (int i=0; i<1;i++) {
-//                    if (MarkerTrovati.size() == 2) {
-//                        break;
-//                    } else {
-//                        doSomething();
-//                    }
-//
-//                }
-//                stampa();
-//            }
-//
-//        });
+        button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                MarkerTrovati.clear();
+                for (int i=0; i<1;i++) {
+                    if (MarkerTrovati.size() == 2) {
+                        break;
+                    } else {
+                        doSomething();
+                    }
+
+                }
+                stampa();
+            }
+
+        });
 
         test = (ImageView) findViewById(R.id.imageView);
 
@@ -164,7 +164,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
         A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
 
-        if (MarkerDetected.size() != 0 ){
+       /* if (MarkerDetected.size() != 0 ){
             Point p1 = MarkerDetected.get(0).findCenter();
             MarkerTrovati.add(MarkerDetected.get(0));
             Log.e("Data", " Marker = " + p1.x + "," + p1.y + "dim = " + ROW/2 + " " + COL/2);
@@ -173,16 +173,16 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             Core.line(frameCapture,p1,new Point(ROW/2,COL/2),new Scalar(255,255,0),10);
             stampa();
 
-        }
+        }*/
 
-        /*if (MarkerDetected.size() != 0 ){
+        if (MarkerDetected.size() != 0 ){
             Log.e("Marker", "Sono esattamente:" + MarkerDetected.size());
             for (int i=0; i<MarkerDetected.size(); i++)
                 if (MarkerTrovati.size()==0 || !near(MarkerTrovati.get(0).findCenter(),MarkerDetected.get(i).findCenter()))
                     MarkerTrovati.add(MarkerDetected.get(i));
         }else{
             Log.e("Marker","Nun ce sò");
-        }*/
+        }
     }
 
 
@@ -277,6 +277,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
         return (float) res;
     }
+
+
 
 }
 
