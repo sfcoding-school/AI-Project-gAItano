@@ -184,13 +184,14 @@ public class MarkerDetector {
                     }
                     sum = sum +"-";
                 }
-                //Log.e("Marker", "= " + sum);
+                Log.e("Marker", "= " + sum);
                 if(marker.checkBorder()){
                     //Log.e("Marker", "ok");
                     int id = marker.calculateMarkerId();
                     //Log.e("Marker", "bordo trovato" + id);
                     if(id ==0){
                         detectedMarkers.add(marker);
+                        Log.e("Marker", "detectedMarkers" + detectedMarkers.size());
                         // rotate the points of the marker so they are always in the same order no matter the camera orientation
                         Collections.rotate(marker, 4-marker.getRotations());
                     }
@@ -198,7 +199,7 @@ public class MarkerDetector {
             }
         }
         // TODO refine using pixel accuracy
-
+        /*
         // now sort by id and check that each marker is only detected once
         Collections.sort(detectedMarkers);
         toRemove.clear();
@@ -221,6 +222,7 @@ public class MarkerDetector {
         for(int i=0;i<detectedMarkers.size();i++){
             detectedMarkers.get(i).calculateExtrinsics(camMatrix, distCoeff, markerSizeMeters);
         }
+        */
     }
 
     /**

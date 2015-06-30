@@ -57,8 +57,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ulisse.test3.MarkerDet.CameraParameters;
+import ulisse.test3.MarkerDet.Code;
 import ulisse.test3.MarkerDet.Marker;
 import ulisse.test3.MarkerDet.MarkerDetector;
+import ulisse.test3.MovementLibrary.Movement;
 
 import static org.opencv.highgui.Highgui.imread;
 
@@ -78,6 +80,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     ImageView test;
     Code code;
     MatOfPoint mat;
+    double COL;
+    double ROW;
 
     private final static double MIN_DISTANCE = 10;
 
@@ -99,6 +103,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         }
     };
     private ClassLoader context;
+    private Movement movementClass;
+    private static UsbSerialPort sPort= null;
 
     @Override
     public void onResume() {
@@ -116,14 +122,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         Log.i("PROVA tag 2", "called onCreate");
         super.onCreate(savedInstanceState);
 
-        /*
-        MarkerList = new ArrayList<Marker>();
-        m_markerCorner = new ArrayList<>();
-        m_markerCorner.add(new Point(0,0));
-        m_markerCorner.add(new Point(6,0));
-        m_markerCorner.add(new Point(6,6));
-        m_markerCorner.add(new Point(0,6));
-*/
+        movementClass = new Movement(getApplicationContext(), sPort);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_tic_tac_toe);
@@ -134,25 +133,26 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         MarkerTrovati = new ArrayList<>();
 
         button = (Button) findViewById(R.id.button12);
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                MarkerTrovati.clear();
-                for (int i=0; i<10;i++) {
-                    if (MarkerTrovati.size() == 2) {
-                        break;
-                    } else {
-                        doSomething();
-                    }
-
-                }
-                stampa();
-            }
-
-        });
+//        button.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View arg0) {
+//                MarkerTrovati.clear();
+//                for (int i=0; i<1;i++) {
+//                    if (MarkerTrovati.size() == 2) {
+//                        break;
+//                    } else {
+//                        doSomething();
+//                    }
+//
+//                }
+//                stampa();
+//            }
+//
+//        });
 
         test = (ImageView) findViewById(R.id.imageView);
+
     }
 
     private void doSomething() {
@@ -165,19 +165,31 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
 
         if (MarkerDetected.size() != 0 ){
-            Log.e("nMarker", "Sono esattamente:" + MarkerDetected.size());
+            Point p1 = MarkerDetected.get(0).findCenter();
+            MarkerTrovati.add(MarkerDetected.get(0));
+            Log.e("Data", " Marker = " + p1.x + "," + p1.y + "dim = " + ROW/2 + " " + COL/2);
+
+            //Core.line(frameCapture,p1,new Point(rows,cols/2),new Scalar(255,255,0),10);
+            Core.line(frameCapture,p1,new Point(ROW/2,COL/2),new Scalar(255,255,0),10);
+            stampa();
+
+        }
+
+        /*if (MarkerDetected.size() != 0 ){
+            Log.e("Marker", "Sono esattamente:" + MarkerDetected.size());
             for (int i=0; i<MarkerDetected.size(); i++)
-                if (MarkerTrovati.size()==0 ||MarkerTrovati.get(0).findCenter()!=MarkerDetected.get(i).findCenter())
+                if (MarkerTrovati.size()==0 || !near(MarkerTrovati.get(0).findCenter(),MarkerDetected.get(i).findCenter()))
                     MarkerTrovati.add(MarkerDetected.get(i));
         }else{
-            Log.e("nMarker","Nun ce sò");
-        }
+            Log.e("Marker","Nun ce sò");
+        }*/
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
+        movementClass.pauseActivity();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
@@ -189,6 +201,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
     static void show(Context context, UsbSerialPort port) {
+        sPort = port;
         final Intent intent = new Intent(context, TicTacToe.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
@@ -216,77 +229,41 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
         contours = new ArrayList<MatOfPoint>();
         hierarchy = new Mat();
-        //mGray = inputFrame.gray();
 
 
         frameCapture = inputFrame.rgba();
 
-        /*double thresParam1, thresParam2;
+        ROW = frameCapture.rows();
+        COL = frameCapture.cols();
 
-        Mat grey, thres, thres2, hierarchy2;
-        List<MatOfPoint> contours2;
-        MatOfPoint mIntermediateMat;
+        //Core.line(frameCapture,new Point(0,0),new Point(ROW/2,COL/2),new Scalar(255,255,0),10);
 
-        thresParam1 = thresParam2 = 7;
-
-        grey = new MatOfPoint();
-        thres = new Mat();
-        thres2 = new Mat();
-        hierarchy2 = new Mat();
-        contours2 = new ArrayList<>();
-        mIntermediateMat = new MatOfPoint();
-
-        Imgproc.cvtColor(inputFrame.rgba(), mGray, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.adaptiveThreshold(mGray, thres, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV, (int) thresParam1, thresParam2);
-        Imgproc.findContours(thres, contours2, hierarchy2, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
-        Mat frameDebug = new Mat();
-        Imgproc.drawContours(mGray, contours2, -1, new Scalar(255, 0, 0), 2);
-
-        */
-
-
-/*
-
-        MatOfKeyPoint points = new MatOfKeyPoint();
-        MatOfKeyPoint marker_points = new MatOfKeyPoint();
-        Mat matrix = mGray;
-
-        FeatureDetector fast = FeatureDetector.create(FeatureDetector.FAST);
-
-        fast.detect(matrix, points);
-
-
-        Scalar redcolor = new Scalar(255, 0, 0);
-        Core.line(mGray, new Point(100, 100), new Point(300, 300), new Scalar(0, 0, 255));
-
-        Features2d.drawKeypoints(mGray, points, mGray, redcolor, 3);
-
-*//*
-
-        */
-/*
-        Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.markers));
-        Mat matrix2 = imread("markers.jpg", 0);
-        fast.detect(matrix2, marker_points);
-
-
-*/
 
         return frameCapture;
     }
 
 
     private void stampa(){
-        //Mat B = new Mat(frameCapture.cols(), mGray.rows(), CvType.CV_8UC1);
         Log.e("Marker", " " + MarkerTrovati.size());
         for (int i=0; i<MarkerTrovati.size(); i++){
             MarkerTrovati.get(i).draw(frameCapture,new Scalar(255,0,0),10,true);
         }
 
-        Bitmap bm = Bitmap.createBitmap(frameCapture.cols(),frameCapture.rows(), Bitmap.Config.ARGB_8888);
+        Bitmap bm = Bitmap.createBitmap(frameCapture.cols(), frameCapture.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(frameCapture, bm);
-        //bm = Bitmap.createScaledBitmap(bm,120,120,false);
+        //bm = Bitmap.createScaledBitmap(bm,frameCapture.cols(),frameCapture.rows(),false);
         test.setImageBitmap(bm);
+    }
+
+    private boolean near(Point p1, Point p2){
+        boolean ris= false;
+        float dis = euqlDist(p1,p2);
+        if (dis <= 20){
+            ris = true;
+        }else {
+            Log.e("Marker","Distanza tra i punti" +dis);
+        }
+        return ris;
     }
 
     private Point subsractPoint(Point v1, Point v2){
@@ -296,68 +273,10 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     }
 
-    private float perimeter(List<Point> v){
-        float peri = 0;
-        for (int i=0; i<v.size(); i++){
-            peri += euqlDist(v.get(i),v.get((i+1)%4));
-        }
-        return peri;
-    }
-
     private float euqlDist(Point a, Point b){
         double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
         return (float) res;
     }
-
-    private int hammDist(Code code){
-        int ids[][] = {
-                {1,0,0,0,0},
-                {1,0,1,1,1},
-                {0,1,0,0,1},
-                {0,1,1,1,0}
-        };
-        int dist = 0;
-        for(int y=0;y<5;y++){
-            int minSum = Integer.MAX_VALUE;
-            // hamming distance to each possible word
-            for(int p=0;p<4;p++){
-                int sum=0;
-                for(int x=0;x<5;x++)
-                    sum+= code.get(y+1,x+1) == ids[p][x]? 0:1;
-                minSum = sum<minSum? sum:minSum;
-            }
-            dist+=minSum;
-        }
-        return dist;
-    }
-
-    public static class Code {// TODO check if the parameters are in range
-        protected int[][] code;
-
-        protected Code(){
-            code = new int[7][7];
-        }
-
-        protected void set(int x, int y, int value){
-            code[x][y] = value;
-        }
-
-        protected int get(int x, int y){
-            return code[x][y];
-        }
-
-        public static Code rotate(Code in){
-            Code out = new Code();
-            for(int i=0;i<7;i++)
-                for(int j=0;j<7;j++){
-                    out.code[i][j] = in.code[6-j][i];
-                }
-            return out;
-        }
-    }
-
-
-
 
 }
 
