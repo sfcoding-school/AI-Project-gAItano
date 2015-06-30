@@ -1,10 +1,14 @@
 package ulisse.test3;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -47,6 +51,7 @@ public class MainActivity extends Activity {
         Button button_movement = (Button) findViewById(R.id.b_movement);
         Button button_TicTacToe = (Button) findViewById(R.id.b_project);
         Button button_gioca = (Button) findViewById(R.id.b_gioca);
+        Button button_QR = (Button) findViewById(R.id.button22);
 
         button_gioca.setOnClickListener(new View.OnClickListener() {
 
@@ -75,6 +80,32 @@ public class MainActivity extends Activity {
 
         });
 
+        button_QR.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                showQRActivity();
+
+
+            }
+
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
+                Log.e("QR", contents);
+            } else
+            if (resultCode == RESULT_CANCELED) {
+                Log.e("QR", "RESULT_CANCELED");
+            }
+        }
     }
 
     private void showGiocaActivity() {
@@ -120,6 +151,11 @@ public class MainActivity extends Activity {
     private void showConsoleActivity() {
        if (port != null)
             GestionMovimentoUI.show(this, port);
+    }
+
+    private void showQRActivity() {
+        if (port != null)
+            QRProject.show(this, port);
     }
 
     private void showTicTacToe() {
