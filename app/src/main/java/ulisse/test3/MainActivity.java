@@ -1,11 +1,15 @@
 package ulisse.test3;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -164,6 +168,24 @@ public class MainActivity extends Activity {
     public static UsbSerialPort getPort(){
         return port;
     }
+
+//    class IncomingHandler extends Handler {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case ServiceMovimento.MSG_SET_VALUE:
+//                    Log.e("Messaggio dal servizio", " "+ msg.arg1);
+//                    break;
+//                default:
+//                    super.handleMessage(msg);
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Activity target published for clients to send messages to IncomingHandler.
+//     */
+//    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
 
 }

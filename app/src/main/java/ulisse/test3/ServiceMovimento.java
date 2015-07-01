@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -128,5 +132,25 @@ public class ServiceMovimento extends Service {
     public void onDestroy(){
         super.onDestroy();
     }
+
+//    class IncomingHandler extends Handler {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            //obtain Activity address from Message
+//            Messenger mClient=msg.replyTo;
+//            try {
+//                // try to send it some mValue
+//                mClient.send(Message.obtain(null,MSG_SET_VALUE, mValue, 0));
+//            } catch (RemoteException e) {
+//                // The client is dead.  Remove it
+//                mClient=null;
+//            }
+//        }
+//    }
+
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+//    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
 }
