@@ -94,21 +94,10 @@ public class QRProject extends Activity {
 
                 Intent intent=new Intent(this,ServiceMovimento.class);
                 Bundle b=new Bundle();
-                b.putString("gAitano", "trovato");
+                b.putString("gAitano", "QRProject");
                 b.putString("QR", contents);
                 intent.putExtras(b);
                 startService(intent);
-
-                /*Log.e("QR", contents);
-                myQ.add(contents);
-                Void[] param = null;
-
-
-                    if (gestioneCodaMovimento.getStatus() != AsyncTask.Status.RUNNING){
-                        gestioneCodaMovimento.execute(param);
-                        Log.e("QR", "async partito");
-                    }
-*/
 
                 qrCerca();
             } else

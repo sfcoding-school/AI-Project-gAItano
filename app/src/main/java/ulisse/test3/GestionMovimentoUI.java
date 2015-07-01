@@ -1,26 +1,5 @@
 package ulisse.test3;
 
-/* Copyright 2011-2013 Google Inc.
- * Copyright 2013 mike wakerly <opensource@hoho.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * Project home page: https://github.com/mik3y/usb-serial-for-android
- */
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -41,39 +20,10 @@ import ulisse.test3.MovementLibrary.Movement;
 
 public class GestionMovimentoUI extends Activity {
 
-    private static UsbSerialPort sPort = null;
-    Movement movementClass;
     private boolean headTest = false;
     private boolean headTestLR = false;
     TextView mDumpTextView;
     ScrollView mScrollView;
-
-
-    private final SerialInputOutputManager.Listener mListener =
-            new SerialInputOutputManager.Listener() {
-
-                @Override
-                public void onRunError(Exception e) {
-                    Log.d("GestionMovimentoUI", "Runner stopped.");
-                }
-
-                @Override
-                public void onNewData(final byte[] data) {
-                    GestionMovimentoUI.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            GestionMovimentoUI.this.updateReceivedData(data);
-                        }
-                    });
-                }
-            };
-
-    private void updateReceivedData(byte[] data) {
-        final String message = "Read " + data.length + " bytes: \n"
-                + HexDump.dumpHexString(data) + "\n\n";
-        mDumpTextView.append(message);
-        mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +35,6 @@ public class GestionMovimentoUI extends Activity {
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
-        movementClass = new Movement(getApplicationContext(), sPort);
 
 
 
@@ -110,7 +59,7 @@ public class GestionMovimentoUI extends Activity {
             @Override
             public void onClick(View arg0) {
 
-                    movementClass.executeCommand("testV");
+                sendToService("testV");
 
             }
         });
@@ -120,11 +69,11 @@ public class GestionMovimentoUI extends Activity {
             @Override
             public void onClick(View arg0) {
                 if (!headTestLR) {
-                    movementClass.executeCommand("headLeft");
+                    sendToService("headLeft");
                     headTestLR = true;
                 } else {
                     headTestLR = false;
-                    movementClass.executeCommand("headDown");
+                    sendToService("headDown");
                 }
             }
         });
@@ -133,7 +82,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("wakeUP");
+                sendToService("wakeUP");
             }
         });
 
@@ -141,7 +90,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("powerOFF");
+                sendToService("powerOFF");
             }
         });
 
@@ -149,7 +98,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("Forward");
+                sendToService("Forward");
             }
         });
 
@@ -157,7 +106,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("Backward");
+                sendToService("Backward");
             }
         });
 
@@ -165,7 +114,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("rotateLeft");
+                sendToService("rotateLeft");
             }
         });
 
@@ -173,7 +122,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("rotateRight");
+                sendToService("rotateRight");
             }
 
         });
@@ -182,7 +131,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("stop");
+                sendToService("stop");
             }
 
         });
@@ -191,7 +140,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("crabLeft");
+                sendToService("crabLeft");
             }
 
         });
@@ -200,7 +149,7 @@ public class GestionMovimentoUI extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                movementClass.executeCommand("crabRight");
+                sendToService("crabRight");
             }
         });
 
@@ -209,31 +158,26 @@ public class GestionMovimentoUI extends Activity {
             @Override
             public void onClick(View arg0) {
                 if (!headTest) {
-                    movementClass.executeCommand("headUP");
+                    sendToService("headUP");
                     headTest = true;
                 } else {
                     headTest = false;
-                    movementClass.executeCommand("headDown");
+                    sendToService("headDown");
                 }
             }
         });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        movementClass.pauseActivity();
-        finish();
+    private void sendToService(String comando){
+        Intent intent=new Intent(this,ServiceMovimento.class);
+        Bundle b=new Bundle();
+        b.putString("gAitano", "MovementClass");
+        b.putString("comando", comando);
+        intent.putExtras(b);
+        startService(intent);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        movementClass.init_connection(/*mListener*/);
-    }
-
-    static void show(Context context, UsbSerialPort port) {
-        sPort = port;
+    static void show(Context context) {
         final Intent intent = new Intent(context, GestionMovimentoUI.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);

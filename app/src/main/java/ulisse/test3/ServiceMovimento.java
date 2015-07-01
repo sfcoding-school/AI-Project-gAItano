@@ -25,7 +25,6 @@ public class ServiceMovimento extends Service {
     private UsbManager mUsbManager;
     private List<UsbSerialPort> mEntries = new ArrayList<>();
     private static UsbSerialPort port = null;
-    private Queue<String> myQ = new LinkedList<>();
     private Movement movement = null;
 
     private void refreshDeviceList() {
@@ -56,25 +55,6 @@ public class ServiceMovimento extends Service {
         }.execute((Void) null);
     }
 
-    private void test() {
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Log.e("asyncService", "ciaociaio");
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void v) {
-                Log.e("asyncService", "onPostExecute");
-
-            }
-
-        }.execute((Void) null);
-    }
-
-
     @Override
     public IBinder onBind(Intent intent) {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -88,12 +68,12 @@ public class ServiceMovimento extends Service {
         if (intent != null) {
             Bundle b = intent.getExtras();
 
-            String Array = b.getString("gAitano");
-            if (Array.equals("init")) {
+            String checkFirst = b.getString("gAitano");
+            if (checkFirst.equals("init")) {
                 mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
                 refreshDeviceList();
 
-            } else if (Array.equals("trovato")) {
+            } else if (checkFirst.equals("QRProject")) {
                 String comando = b.getString("QR");
                 Log.e("ServiceTest", comando);
                 if (comando.contains(";")){
@@ -118,6 +98,19 @@ public class ServiceMovimento extends Service {
                         Toast.makeText(getApplicationContext(), "movement è NULL su comando singolo",
                                 Toast.LENGTH_SHORT).show();
                     }
+                }
+            } else if(checkFirst.equals("MovementClass")){
+                String comando = b.getString("comando");
+                Log.e("ServiceTest", comando);
+                if (movement != null) {
+                    movement.executeCommand(comando);
+                    Log.e("ServiceTest", "executeCommand MovementClass");
+                    Toast.makeText(getApplicationContext(), "MovementClass - executeCommand su comando singolo",
+                            Toast.LENGTH_SHORT).show();
+                }else{
+                    Log.e("ServiceTest", "MovementClass - movement è NULL su comando singolo");
+                    Toast.makeText(getApplicationContext(), "MovementClass - movement è NULL su comando singolo",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         }
