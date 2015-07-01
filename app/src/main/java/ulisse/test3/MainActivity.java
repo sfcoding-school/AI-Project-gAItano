@@ -145,8 +145,7 @@ public class MainActivity extends Activity {
     }
 */
     private void showConsoleActivity() {
-       if (port != null)
-            GestionMovimentoUI.show(this, port);
+       GestionMovimentoUI.show(this, port);
     }
 
     private void showQRActivity() {
@@ -165,4 +164,6 @@ public class MainActivity extends Activity {
     public static UsbSerialPort getPort(){
         return port;
     }
+
+
 }

@@ -7,7 +7,9 @@ import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
@@ -39,6 +41,8 @@ public class ServiceMovimento extends Service {
                 mEntries.clear();
                 mEntries.addAll(result);
                 if (mEntries.size() > 0) {
+                    Toast.makeText(getApplicationContext(), "ho trovato una porta",
+                            Toast.LENGTH_SHORT).show();
                     port = mEntries.get(0);
                     movement = new Movement(getApplicationContext(), port);
                     movement.init_connection();
@@ -92,15 +96,37 @@ public class ServiceMovimento extends Service {
             } else if (Array.equals("trovato")) {
                 String comando = b.getString("QR");
                 Log.e("ServiceTest", comando);
+                if (comando.contains(";")){
+                    Log.e("ServiceTest", "true" + comando);
+                    String[] parts = comando.split(";");
+                    Log.e("ServiceTest", String.valueOf(parts.length));
+                    for (int i=0; i<parts.length; i++){
+                        if (movement != null) movement.executeCommand(parts[i]);
+                        else{  Log.e("ServiceTest", "movement null");break;}
+                        if (parts[i].equals("wakeUP")) SystemClock.sleep(10000);
+                        SystemClock.sleep(2000);
+                    }
 
-                //movement = new Movement(getApplicationContext(), null); //TEST
-                if (movement != null) {
-                    movement.executeCommand(comando);
-                    Log.e("ServiceTest", "executeCommand");
+                } else {
+                    if (movement != null) {
+                        movement.executeCommand(comando);
+                        Log.e("ServiceTest", "executeCommand");
+                        Toast.makeText(getApplicationContext(), "executeCommand su comando singolo",
+                                Toast.LENGTH_SHORT).show();
+                    }else{
+                        Log.e("ServiceTest", "movement è NULL su comando singolo");
+                        Toast.makeText(getApplicationContext(), "movement è NULL su comando singolo",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
-
             }
         }
         return START_STICKY;
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+
 }
