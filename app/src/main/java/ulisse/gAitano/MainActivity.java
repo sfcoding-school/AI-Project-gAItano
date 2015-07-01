@@ -1,15 +1,11 @@
 package ulisse.gAitano;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
@@ -20,13 +16,6 @@ import ulisse.gAitano.Utility.ServiceMovimento;
 
 public class MainActivity extends Activity {
 
-    private LinearLayout layout_init;
-    private LinearLayout layout_choice;
-    private ProgressBar mProgressBar;
-    private UsbManager mUsbManager;
-    private List<UsbSerialPort> mEntries = new ArrayList<>();
-    private static UsbSerialPort port = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,10 +23,6 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         initLayout();
-        //layout_choice.setVisibility(LinearLayout.GONE);
-        //refreshDeviceList();
-
-       // startService(new Intent(this, ServiceMovimento.class));
 
         Intent intent=new Intent(this,ServiceMovimento.class);
         Bundle b=new Bundle();
@@ -50,10 +35,6 @@ public class MainActivity extends Activity {
     }
 
     private void initLayout() {
-        layout_init = (LinearLayout) findViewById(R.id.layout_init);
-        layout_choice = (LinearLayout) findViewById(R.id.layout_choice);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         Button button_movement = (Button) findViewById(R.id.b_movement);
         Button button_TicTacToe = (Button) findViewById(R.id.b_project);
         Button button_gioca = (Button) findViewById(R.id.b_gioca);
@@ -104,44 +85,6 @@ public class MainActivity extends Activity {
         GiocaActivity.show(this);
     }
 
-/*    private void refreshDeviceList() {
-        showProgressBar();
-
-        new AsyncTask<Void, Void, List<UsbSerialPort>>() {
-            @Override
-            protected List<UsbSerialPort> doInBackground(Void... params) {
-                return Movement.searchUsbSerial(mUsbManager);
-            }
-
-            @Override
-            protected void onPostExecute(List<UsbSerialPort> result) {
-                mEntries.clear();
-                mEntries.addAll(result);
-                hideProgressBar();
-                if (mEntries.size() > 0) {
-                    port = mEntries.get(0);
-                    layout_init.setVisibility(View.GONE);
-                    layout_choice.setVisibility(View.VISIBLE);
-                    Log.e("settoPorta1", String.valueOf(port));
-                    //Movement.sPort = port;
-                } else {
-                    port = null;
-                    refreshDeviceList();
-                }
-
-            }
-
-        }.execute((Void) null);
-    }*/
-
-   /* private void showProgressBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressBar() {
-        mProgressBar.setVisibility(View.INVISIBLE);
-    }
-*/
     private void showConsoleActivity() {
        GestionMovimentoUI.show(this);
     }
@@ -155,12 +98,8 @@ public class MainActivity extends Activity {
 
     private void showTicTacToe() {
         //if (port != null)
-        MarkerDetector.show(this, port);
+        MarkerDetector.show(this);
         //test2.show(this, port);
-    }
-
-    public static UsbSerialPort getPort(){
-        return port;
     }
 
 //    class IncomingHandler extends Handler {
