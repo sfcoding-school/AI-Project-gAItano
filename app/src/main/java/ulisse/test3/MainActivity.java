@@ -149,7 +149,7 @@ public class MainActivity extends Activity {
     }
 */
     private void showConsoleActivity() {
-       GestionMovimentoUI.show(this, port);
+       GestionMovimentoUI.show(this);
     }
 
     private void showQRActivity() {
