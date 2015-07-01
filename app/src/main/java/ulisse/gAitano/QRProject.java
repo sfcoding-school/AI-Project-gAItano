@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.gAitano;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+
+import ulisse.gAitano.Utility.ServiceMovimento;
 
 public class QRProject extends Activity {
 

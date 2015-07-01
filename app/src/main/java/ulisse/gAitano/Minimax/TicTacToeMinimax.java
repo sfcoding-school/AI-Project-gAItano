@@ -1,4 +1,4 @@
-package ulisse.test3.Minimax;
+package ulisse.gAitano.Minimax;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.gAitano;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+
+import ulisse.gAitano.Utility.ServiceMovimento;
 
 public class GestionMovimentoUI extends Activity {
 

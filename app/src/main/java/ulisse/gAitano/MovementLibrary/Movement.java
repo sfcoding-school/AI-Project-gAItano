@@ -6,7 +6,7 @@ e il metodo "executeCommand" che tramite la classe MovementHex servirà a far es
 a gAitano.
  */
 
-package ulisse.test3.MovementLibrary;
+package ulisse.gAitano.MovementLibrary;
 
 import android.content.Context;
 import android.hardware.usb.UsbDeviceConnection;

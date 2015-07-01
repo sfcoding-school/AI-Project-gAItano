@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.gAitano;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
-import ulisse.test3.Minimax.TicTacToeMinimax;
+import ulisse.gAitano.Minimax.TicTacToeMinimax;
 
 public class GiocaActivity extends Activity {
 

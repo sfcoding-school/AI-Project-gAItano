@@ -3,9 +3,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
-        applicationId "ulisse.test3"
+        applicationId 'ulisse.gAitano'
         minSdkVersion 18
         versionCode 1
         versionName "1.0"
@@ -16,10 +15,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':usbSerialForAndroid')
     compile project(':openCVLibrary249')
 }

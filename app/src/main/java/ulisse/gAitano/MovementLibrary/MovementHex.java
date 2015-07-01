@@ -26,7 +26,7 @@ il pacchetto PIP è formato praticamente uguale tranne per il fatto che si avran
 rimane il fatto che l'header è uguale, e bisogna alla fine fare il checksum con tutto
 */
 
-package ulisse.test3.MovementLibrary;
+package ulisse.gAitano.MovementLibrary;
 
 import java.util.HashMap;
 import java.util.Map;

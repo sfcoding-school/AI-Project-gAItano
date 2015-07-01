@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.gAitano.Utility;
 
 import android.app.Service;
 import android.content.Context;
@@ -6,11 +6,7 @@ import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,11 +14,9 @@ import android.widget.Toast;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-import ulisse.test3.MovementLibrary.Movement;
+import ulisse.gAitano.MovementLibrary.Movement;
 
 public class ServiceMovimento extends Service {
 

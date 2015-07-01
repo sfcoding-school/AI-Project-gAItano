@@ -1,6 +1,6 @@
 
 
-package ulisse.test3;
+package ulisse.gAitano;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,16 +33,15 @@ import org.opencv.core.Scalar;
 import java.util.ArrayList;
 import java.util.List;
 
-import ulisse.test3.MarkerDet.CameraParameters;
-import ulisse.test3.MarkerDet.Code;
-import ulisse.test3.MarkerDet.Marker;
-import ulisse.test3.MarkerDet.MarkerDetector;
-import ulisse.test3.MovementLibrary.Movement;
+import ulisse.gAitano.MarkerDet.CameraParameters;
+import ulisse.gAitano.MarkerDet.Code;
+import ulisse.gAitano.MarkerDet.Marker;
+import ulisse.gAitano.MovementLibrary.Movement;
 
 import static org.opencv.highgui.Highgui.imread;
 
 
-public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MarkerDetector extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
 
     private List<Marker> MarkerTrovati;
@@ -133,7 +132,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
     private void doSomething() {
-        MarkerDetector A = new MarkerDetector();
+        ulisse.gAitano.MarkerDet.MarkerDetector A = new ulisse.gAitano.MarkerDet.MarkerDetector();
         CameraParameters mCamParam = new CameraParameters();
         float markerSizeMeters = 0.034f;
 
@@ -179,7 +178,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
 
     static void show(Context context, UsbSerialPort port) {
         sPort = port;
-        final Intent intent = new Intent(context, TicTacToe.class);
+        final Intent intent = new Intent(context, MarkerDetector.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
     }
