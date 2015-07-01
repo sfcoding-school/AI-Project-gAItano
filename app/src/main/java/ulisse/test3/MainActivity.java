@@ -39,12 +39,11 @@ public class MainActivity extends Activity {
         //layout_choice.setVisibility(LinearLayout.GONE);
         //refreshDeviceList();
 
-        Intent serviceIntent = new Intent(ServiceMovimento.class.getName());
-        startService(serviceIntent);
+       // startService(new Intent(this, ServiceMovimento.class));
 
-        Intent intent=new Intent(ServiceMovimento.class.getName());
+        Intent intent=new Intent(this,ServiceMovimento.class);
         Bundle b=new Bundle();
-        b.putString("Array", "ciao");
+        b.putString("init", "init");
         intent.putExtras(b);
         startService(intent);
 
