@@ -79,9 +79,18 @@ public class ServiceMovimento extends Service {
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
-l
+
         Bundle b=intent.getExtras();
-        String Array = b.getString("Array");
+
+        String Array = b.getString("init");
+        if (Array.equals("init")){
+            mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+            refreshDeviceList();
+        }
+
+        //Movement a = new Movement();
+
+
         Log.e("testService", Array);
 
         return START_STICKY;
