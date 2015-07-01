@@ -79,7 +79,7 @@ public class ServiceMovimento extends Service {
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
-
+l
         Bundle b=intent.getExtras();
         String Array = b.getString("Array");
         Log.e("testService", Array);
