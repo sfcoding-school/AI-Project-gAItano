@@ -4,29 +4,13 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
-
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.ExecutionException;
-
-import ulisse.test3.MovementLibrary.Movement;
 
 public class QRProject extends Activity {
-
-    private Button buttonAvvio;
-    private UsbSerialPort sPort = null;
-    private Movement movementClass;
-    private Queue<String> myQ=new LinkedList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +18,7 @@ public class QRProject extends Activity {
         setContentView(R.layout.qrproject);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-        buttonAvvio = (Button) findViewById(R.id.b_avvio);
-
-
-
-        sPort = MainActivity.getPort();
-        if (sPort == null)
-            Toast.makeText(getApplicationContext(), "sPort è NULL",
-                    Toast.LENGTH_SHORT).show();
-        else {
-            Log.e("settoPorta2", String.valueOf(sPort));
-            movementClass = new Movement(getApplicationContext(), sPort);
-        }
-
+        Button buttonAvvio = (Button) findViewById(R.id.b_avvio);
         buttonAvvio.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -56,17 +27,6 @@ public class QRProject extends Activity {
             }
 
         });
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();  // Always call the superclass
-        if(movementClass != null) movementClass.init_connection();
-        else{
-            Toast.makeText(getApplicationContext(), "movementClass è NULL su onStart",
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void qrCerca(){
@@ -78,7 +38,7 @@ public class QRProject extends Activity {
             intent.putExtra("RESULT_DISPLAY_DURATION_MS", 10);
             startActivityForResult(intent, 0);
 
-        } catch (ActivityNotFoundException e) { //se l'app non fosse installata
+        } catch (ActivityNotFoundException e) { //if the app is not installed
             Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
             Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
             startActivity(marketIntent);
@@ -102,54 +62,8 @@ public class QRProject extends Activity {
                 qrCerca();
             } else
             if (resultCode == RESULT_CANCELED) {
-                Log.e("QR", "RESULT_CANCELED");
+                Log.e("QRProject", "onActivityResult - RESULT_CANCELED");
             }
         }
     }
-
-    boolean prima = true;
-
-    final AsyncTask gestioneCodaMovimento = new AsyncTask<Void, Void, Void>() {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            int time = 5000;
-            while (true) {
-                if (sPort != null && movementClass != null) {
-                    Log.e("asynctask1", sPort + " " + movementClass);
-                    Log.e("asynctask2", String.valueOf(myQ.size()));
-                    if (myQ.size()>0){
-                        String comand = myQ.poll();
-                        Log.e("asynctask3", comand);
-                        if (comand.equals("wakeUP")){
-                            time = 15000;
-                            movementClass.executeCommand(comand);
-                            Log.e("asynctask4", "a");
-                        } else{
-                            time = 15000;
-                            movementClass.executeCommand(comand);
-                            if (prima){movementClass.executeCommand(comand); prima=false;}
-                            Log.e("asynctask5", "a");
-                        }
-
-
-                    }
-                } else {
-                    Log.e("asynctask", sPort + " " + movementClass);
-                    return null;
-                }
-                SystemClock.sleep(time);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-        }
-    };
 }

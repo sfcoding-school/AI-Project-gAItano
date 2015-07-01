@@ -2,7 +2,7 @@
 Libreria movimento
 
 In questa classe si ha semplicemente la connessione tramite cavo seriale (init_connection)
-e la funzione "executeCommand" che tramite la classe MovementHex servirà a far eseguire i movimenti
+e il metodo "executeCommand" che tramite la classe MovementHex servirà a far eseguire i movimenti
 a gAitano.
  */
 
@@ -22,8 +22,6 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Movement extends MovementHex {
 
@@ -33,34 +31,26 @@ public class Movement extends MovementHex {
     private static Context context = null;
     private boolean serialOk = false;
     private SerialInputOutputManager mSerialIoManager;
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     public Movement(Context context_temp, UsbSerialPort sPort_temp){
-        Log.e("settoPorta3", String.valueOf(sPort_temp));
         sPort = sPort_temp;
-        Log.e("settoPorta4", String.valueOf(sPort));
         context = context_temp;
     }
 
     public void init_connection(/*SerialInputOutputManager.Listener mListener*/) {
-        Log.e(TAG, "Resumed, port=" + sPort);
-
         if (sPort == null) {
-            Log.e(TAG, "onResume: sPort is Null");
+            Log.e(TAG, "init_connection: sPort is Null");
         } else {
             final UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
             UsbDeviceConnection connection = usbManager.openDevice(sPort.getDriver().getDevice());
-            Log.e(TAG, "Resumed, port=" + sPort.getDriver());
-            Log.e(TAG, "Resumed, port=" + sPort.getDriver().getDevice());
             if (connection == null) {
-                Log.d(TAG, "onResume: Opening device failed");
+                Log.d(TAG, "onResume: Opening device failed, connection is NULL");
                 return;
             }
             try {
                 sPort.open(connection);
                 sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
                 serialOk = true;
-                //startIoManager(mListener);
             } catch (IOException e) {
                 Log.e(TAG, "onResume: Error opening device: " + e.getMessage());
                 serialOk = false;
@@ -74,7 +64,6 @@ public class Movement extends MovementHex {
             }
             Log.e(TAG, "onResume: Serial device: " + sPort.getClass().getSimpleName());
         }
-        //onDeviceStateChange();
     }
 
     private void stopIoManager() {
@@ -97,23 +86,7 @@ public class Movement extends MovementHex {
         }
     }
 
-    public void startIoManager(SerialInputOutputManager.Listener mListener) {
-        if (sPort != null) {
-            Log.e(TAG, "Starting io manager ..");
-            mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
-            mExecutor.submit(mSerialIoManager);
-        }
-    }
-
-    public void onDeviceStateChange(SerialInputOutputManager.Listener mListener) {
-        stopIoManager();
-        startIoManager(mListener);
-    }
-
-
-
     public void executeCommand(String comando){
-        Log.e("settoPorta6", String.valueOf(sPort));
         if (serialOk) {
             try {
                 sPort.write(returnCommand(comando), 200);
@@ -121,19 +94,17 @@ public class Movement extends MovementHex {
                 Log.e(TAG, "Error execute command" + e.getMessage());
             }
         } else {
-            Log.e(TAG, "executeCommand" +  serialOk);
+            Log.e(TAG, "executeCommand serialOk is False");
         }
-
     }
 
     //Questo metodo trova e restituisce l'eventuale seriale connessa al device
     // utilizza la libreria usbSerialForAndroid
     public static List<UsbSerialPort> searchUsbSerial(UsbManager mUsbManager){
-        Log.d("test2", "Refreshing device list ...");
         SystemClock.sleep(1000);
         final List<UsbSerialDriver> drivers =
                 UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
-        final List<UsbSerialPort> result = new ArrayList<UsbSerialPort>();
+        final List<UsbSerialPort> result = new ArrayList<>();
         for (final UsbSerialDriver driver : drivers) {
             final List<UsbSerialPort> ports = driver.getPorts();
             result.addAll(ports);
