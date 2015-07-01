@@ -50,6 +50,25 @@ public class ServiceMovimento extends Service {
         }.execute((Void) null);
     }
 
+    private void test() {
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+               Log.e("asyncService", "ciaociaio");
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                Log.e("asyncService", "onPostExecute");
+
+            }
+
+        }.execute((Void) null);
+    }
+
+
     @Override
     public IBinder onBind(Intent intent) {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -62,7 +81,7 @@ public class ServiceMovimento extends Service {
     public int onStartCommand (Intent intent, int flags, int startId){
 
         Bundle b=intent.getExtras();
-       String Array = b.getString("Array");
+        String Array = b.getString("Array");
         Log.e("testService", Array);
 
         return START_STICKY;
