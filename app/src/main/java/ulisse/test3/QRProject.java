@@ -91,7 +91,15 @@ public class QRProject extends Activity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT"); //this is the result
-                Log.e("QR", contents);
+
+                Intent intent=new Intent(this,ServiceMovimento.class);
+                Bundle b=new Bundle();
+                b.putString("gAitano", "trovato");
+                b.putString("QR", contents);
+                intent.putExtras(b);
+                startService(intent);
+
+                /*Log.e("QR", contents);
                 myQ.add(contents);
                 Void[] param = null;
 
@@ -100,7 +108,7 @@ public class QRProject extends Activity {
                         gestioneCodaMovimento.execute(param);
                         Log.e("QR", "async partito");
                     }
-
+*/
 
                 qrCerca();
             } else

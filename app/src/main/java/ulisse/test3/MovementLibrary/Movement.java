@@ -120,6 +120,8 @@ public class Movement extends MovementHex {
             } catch (IOException e) {
                 Log.e(TAG, "Error execute command" + e.getMessage());
             }
+        } else {
+            Log.e(TAG, "executeCommand" +  serialOk);
         }
 
     }

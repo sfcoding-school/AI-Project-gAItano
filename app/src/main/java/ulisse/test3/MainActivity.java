@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 
         Intent intent=new Intent(this,ServiceMovimento.class);
         Bundle b=new Bundle();
-        b.putString("init", "init");
+        b.putString("gAitano", "init");
         intent.putExtras(b);
         startService(intent);
 
