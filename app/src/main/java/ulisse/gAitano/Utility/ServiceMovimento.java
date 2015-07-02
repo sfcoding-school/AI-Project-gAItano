@@ -38,8 +38,17 @@ public class ServiceMovimento extends Service {
     private static boolean isRunning = false;
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();
 
+    public void onCreate() {
+        super.onCreate();
+        Log.e("Messaggio Servizio S", "Service Started.");
+        isRunning = true;
+
+    }
+
 
     private void refreshDeviceList() {
+
+
 
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
             @Override
@@ -53,6 +62,8 @@ public class ServiceMovimento extends Service {
                 mEntries.addAll(result);
                 if (mEntries.size() > 0) {
 
+                    Log.e("Messaggio Servizio S", "Messaggio Mandato");
+                    sendMessageToUI(1);
 
                     Toast.makeText(getApplicationContext(), "ho trovato una porta",
                             Toast.LENGTH_SHORT).show();
@@ -75,8 +86,9 @@ public class ServiceMovimento extends Service {
         refreshDeviceList();
         Log.e("testService", "IBINDER");
 
-        return null;
+        return mMessenger.getBinder();
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -136,6 +148,7 @@ public class ServiceMovimento extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        isRunning = false;
     }
 
     class IncomingHandler extends Handler { // Handler of incoming messages from clients.
@@ -144,11 +157,15 @@ public class ServiceMovimento extends Service {
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClients.add(msg.replyTo);
+                    Log.e("Messaggio Servizio S", "handleMessage 1");
                     break;
                 case MSG_UNREGISTER_CLIENT:
                     mClients.remove(msg.replyTo);
+                    Log.e("Messaggio Servizio S", "handleMessage 2");
                     break;
                 case MSG_SET_INT_VALUE:
+                    Log.e("Messaggio Servizio S", "handleMessage 3");
+                    mClients.add(msg.replyTo);
                     break;
                 default:
                     super.handleMessage(msg);

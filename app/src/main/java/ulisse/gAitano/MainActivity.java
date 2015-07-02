@@ -14,12 +14,14 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
@@ -30,32 +32,49 @@ import ulisse.gAitano.Utility.ServiceMovimento;
 
 public class MainActivity extends Activity {
 
+    private boolean check;
+    Button button_movement;
+    Button button_TicTacToe;
+    Button button_gioca;
+    Button button_QR;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        check = false;
 
         initLayout();
 
 
-        Log.e("Messaggio Servizio","onCreate");
 
-        Intent intent=new Intent(this,ServiceMovimento.class);
-        Bundle b=new Bundle();
+        Intent intent = new Intent(this,ServiceMovimento.class);
+
+        doBindService();
+
+        Bundle b = new Bundle();
         b.putString("gAitano", "init");
         intent.putExtras(b);
         startService(intent);
 
+        CheckIfServiceIsRunning();
 
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
 
     }
 
+
     private void initLayout() {
-        Button button_movement = (Button) findViewById(R.id.b_movement);
-        Button button_TicTacToe = (Button) findViewById(R.id.b_project);
-        Button button_gioca = (Button) findViewById(R.id.b_gioca);
-        Button button_QR = (Button) findViewById(R.id.button22);
+        button_movement = (Button) findViewById(R.id.b_movement);
+        button_TicTacToe = (Button) findViewById(R.id.b_project);
+        button_gioca = (Button) findViewById(R.id.b_gioca);
+        button_QR = (Button) findViewById(R.id.button22);
+
+
 
         button_gioca.setOnClickListener(new View.OnClickListener() {
 
@@ -96,7 +115,17 @@ public class MainActivity extends Activity {
 
         });
 
+
+        button_movement.setEnabled(false);
+        button_TicTacToe.setEnabled(false);
+        button_QR.setEnabled(false);
+
+
+
+
+
     }
+
 
     private void showGiocaActivity() {
         GiocaActivity.show(this);
@@ -125,12 +154,20 @@ public class MainActivity extends Activity {
     boolean mIsBound;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
+
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case ServiceMovimento.MSG_SET_INT_VALUE:
-                    Log.e("Messaggio Servizio","Int Message: " + msg.arg1);
+                    if (msg.arg1==1) {
+                        Toast.makeText(getApplicationContext(), "SONO ENTRATO",
+                                Toast.LENGTH_SHORT).show();
+                        button_movement.setEnabled(true);
+                        button_TicTacToe.setEnabled(true);
+                        button_QR.setEnabled(true);
+                        Log.e("Messaggio Servizio","Int Message: " +msg.arg1);
+                    }
                     break;
                 case ServiceMovimento.MSG_SET_STRING_VALUE:
                     String str1 = msg.getData().getString("str1");
@@ -141,6 +178,10 @@ public class MainActivity extends Activity {
             }
         }
     }
+
+
+
+
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mService = new Messenger(service);
@@ -167,7 +208,7 @@ public class MainActivity extends Activity {
         super.onSaveInstanceState(outState);
         Log.e("Messaggio Servizio", "onSavedInstanceState");
     }
-    
+
     private void restoreMe(Bundle state) {
         if (state!=null) {
             Log.e("Messaggio Servizio", "restoreMe");
@@ -177,6 +218,7 @@ public class MainActivity extends Activity {
     private void CheckIfServiceIsRunning() {
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (ServiceMovimento.isRunning()) {
+            Log.e("Messaggio Servizio", "CheckIfServiceIsRunning");
             doBindService();
         }
     }
@@ -206,7 +248,23 @@ public class MainActivity extends Activity {
         }
     }
 
-
+    private void sendMessageToService(int intvaluetosend) {
+        if (mIsBound) {
+            if (mService != null) {
+                try {
+                    Log.e("Messaggio Servizio", "Mando ms 1");
+                    Message msg = Message.obtain(null, ServiceMovimento.MSG_SET_INT_VALUE, intvaluetosend, 0);
+                    Log.e("Messaggio Servizio", "Mando ms 2");
+                    msg.replyTo = mMessenger;
+                    Log.e("Messaggio Servizio", "Mando ms 3");
+                    mService.send(msg);
+                    Log.e("Messaggio Servizio", "Mando ms 4");
+                }
+                catch (RemoteException e) {
+                }
+            }
+        }
+    }
 
 
 }
