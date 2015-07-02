@@ -29,18 +29,17 @@ public class ServiceMovimento extends Service {
     private static UsbSerialPort port = null;
     private Movement movement = null;
 
-    int mValue = 0; // Holds last value set by a client.
+
     public static final int MSG_REGISTER_CLIENT = 1;
     public static final int MSG_UNREGISTER_CLIENT = 2;
     public static final int MSG_SET_INT_VALUE = 3;
-    public static final int MSG_SET_STRING_VALUE = 4;
+
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
     private static boolean isRunning = false;
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();
 
     public void onCreate() {
         super.onCreate();
-        Log.e("Messaggio Servizio S", "Service Started.");
         isRunning = true;
 
     }
@@ -62,9 +61,7 @@ public class ServiceMovimento extends Service {
                 mEntries.addAll(result);
                 if (mEntries.size() > 0) {
 
-                    Log.e("Messaggio Servizio S", "Messaggio Mandato");
                     sendMessageToUI(1);
-
                     Toast.makeText(getApplicationContext(), "ho trovato una porta",
                             Toast.LENGTH_SHORT).show();
                     port = mEntries.get(0);
@@ -84,8 +81,6 @@ public class ServiceMovimento extends Service {
     public IBinder onBind(Intent intent) {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         refreshDeviceList();
-        Log.e("testService", "IBINDER");
-
         return mMessenger.getBinder();
     }
 
@@ -177,14 +172,6 @@ public class ServiceMovimento extends Service {
             try {
                 // Send data as an Integer
                 mClients.get(i).send(Message.obtain(null, MSG_SET_INT_VALUE, intvaluetosend, 0));
-
-                //Send data as a String
-                Bundle b = new Bundle();
-                b.putString("str1", "ab" + intvaluetosend + "cd");
-                Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
-                msg.setData(b);
-                mClients.get(i).send(msg);
-
             }
             catch (RemoteException e) {
                 // The client is dead. Remove it from the list; we are going through the list from back to front so this is safe to do inside the loop.
