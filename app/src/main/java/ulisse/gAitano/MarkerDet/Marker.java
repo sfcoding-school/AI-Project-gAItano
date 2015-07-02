@@ -1,4 +1,4 @@
-package ulisse.test3.MarkerDet;
+package ulisse.gAitano.MarkerDet;
 
 import android.util.Log;
 
@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Vector;
 
 
-
-import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.CvType;
@@ -17,8 +15,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
-
 
 
 /**

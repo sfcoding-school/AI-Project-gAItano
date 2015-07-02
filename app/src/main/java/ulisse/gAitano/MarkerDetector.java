@@ -1,30 +1,19 @@
 
 
-package ulisse.test3;
+package ulisse.gAitano;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.textservice.TextInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Vector;
 
 
@@ -35,37 +24,24 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.features2d.FeatureDetector;
-import org.opencv.features2d.Features2d;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
 
-import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import ulisse.test3.MarkerDet.CameraParameters;
-import ulisse.test3.MarkerDet.Code;
-import ulisse.test3.MarkerDet.Marker;
-import ulisse.test3.MarkerDet.MarkerDetector;
-import ulisse.test3.MovementLibrary.Movement;
+import ulisse.gAitano.MarkerDet.CameraParameters;
+import ulisse.gAitano.MarkerDet.Code;
+import ulisse.gAitano.MarkerDet.Marker;
+import ulisse.gAitano.MovementLibrary.Movement;
 
 import static org.opencv.highgui.Highgui.imread;
 
 
-public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MarkerDetector extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
 
     private List<Marker> MarkerTrovati;
@@ -125,7 +101,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
         movementClass = new Movement(getApplicationContext(), sPort);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_tic_tac_toe);
+        setContentView(R.layout.activity_marker_det);
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.OpenCvView);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -156,7 +132,7 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
     }
 
     private void doSomething() {
-        MarkerDetector A = new MarkerDetector();
+        ulisse.gAitano.MarkerDet.MarkerDetector A = new ulisse.gAitano.MarkerDet.MarkerDetector();
         CameraParameters mCamParam = new CameraParameters();
         float markerSizeMeters = 0.034f;
 
@@ -200,9 +176,8 @@ public class TicTacToe extends Activity implements CameraBridgeViewBase.CvCamera
             mOpenCvCameraView.disableView();
     }
 
-    static void show(Context context, UsbSerialPort port) {
-        sPort = port;
-        final Intent intent = new Intent(context, TicTacToe.class);
+    static void show(Context context) {
+        final Intent intent = new Intent(context, MarkerDetector.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
     }

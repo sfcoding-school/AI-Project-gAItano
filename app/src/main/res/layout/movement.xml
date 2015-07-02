@@ -5,9 +5,10 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/layout_movement">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/layout_movement"
+        android:gravity="center_vertical">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -93,61 +94,6 @@
                 android:id="@+id/button3"
                 android:layout_gravity="center_horizontal" />
         </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Head UP/DOWN"
-                android:id="@+id/button8"
-                android:layout_gravity="center_horizontal" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="HEAD L/R"
-                android:id="@+id/button10" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TEST"
-                android:id="@+id/button11"
-                android:gravity="center_horizontal|fill_vertical" />
-        </LinearLayout>
-
-        <View
-            android:id="@+id/separator"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/demoTitle"
-            android:layout_height="1dip"
-            android:background="#eeeeee" />
-
-        <ScrollView
-            android:id="@+id/demoScroller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/separator" >
-
-            <TextView
-                android:id="@+id/consoleText"
-                android:textIsSelectable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:typeface="monospace" />
-        </ScrollView>
 
     </LinearLayout>
 

@@ -26,7 +26,7 @@ il pacchetto PIP è formato praticamente uguale tranne per il fatto che si avran
 rimane il fatto che l'header è uguale, e bisogna alla fine fare il checksum con tutto
 */
 
-package ulisse.test3.MovementLibrary;
+package ulisse.gAitano.MovementLibrary;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,13 +48,8 @@ public class MovementHex {
         put("headUP","0x7e0348007f38");
         put("headDown","0x7e03480000b7");
         put("headLeft","0x7e03486e0049");
-
-        //inclina il corpo di 118 (parte davanti verso l'alto)
-        put("test2","0x7e074276000000000047");
-
-        //
-        //put("PipForward", "0x7e044d001000a2"); //movimento avanti tramite PIP di "unità" 10 su 127
-        put("testV", "0x7e017689");
+        put("test2","0x7e074276000000000047"); //inclina il corpo di 118 (parte davanti verso l'alto)
+        put("PipForward", "0x7e044d001000a2"); //movimento avanti tramite PIP di "unità" 10 su 127
     }};
 
     public byte[] returnCommand(String command){

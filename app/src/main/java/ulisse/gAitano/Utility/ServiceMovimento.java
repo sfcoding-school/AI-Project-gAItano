@@ -1,4 +1,4 @@
-package ulisse.test3;
+package ulisse.gAitano.Utility;
 
 import android.app.Service;
 import android.content.Context;
@@ -18,11 +18,9 @@ import android.widget.Toast;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-import ulisse.test3.MovementLibrary.Movement;
+import ulisse.gAitano.MovementLibrary.Movement;
 
 public class ServiceMovimento extends Service {
 
@@ -32,10 +30,10 @@ public class ServiceMovimento extends Service {
     private Movement movement = null;
 
     int mValue = 0; // Holds last value set by a client.
-    static final int MSG_REGISTER_CLIENT = 1;
-    static final int MSG_UNREGISTER_CLIENT = 2;
-    static final int MSG_SET_INT_VALUE = 3;
-    static final int MSG_SET_STRING_VALUE = 4;
+    public static final int MSG_REGISTER_CLIENT = 1;
+    public static final int MSG_UNREGISTER_CLIENT = 2;
+    public static final int MSG_SET_INT_VALUE = 3;
+    public static final int MSG_SET_STRING_VALUE = 4;
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
     private static boolean isRunning = false;
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();
