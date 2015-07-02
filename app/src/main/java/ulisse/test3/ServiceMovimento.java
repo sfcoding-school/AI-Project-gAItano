@@ -31,6 +31,16 @@ public class ServiceMovimento extends Service {
     private static UsbSerialPort port = null;
     private Movement movement = null;
 
+    int mValue = 0; // Holds last value set by a client.
+    static final int MSG_REGISTER_CLIENT = 1;
+    static final int MSG_UNREGISTER_CLIENT = 2;
+    static final int MSG_SET_INT_VALUE = 3;
+    static final int MSG_SET_STRING_VALUE = 4;
+    final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
+    private static boolean isRunning = false;
+    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+
+
     private void refreshDeviceList() {
 
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
@@ -44,6 +54,8 @@ public class ServiceMovimento extends Service {
                 mEntries.clear();
                 mEntries.addAll(result);
                 if (mEntries.size() > 0) {
+
+
                     Toast.makeText(getApplicationContext(), "ho trovato una porta",
                             Toast.LENGTH_SHORT).show();
                     port = mEntries.get(0);
@@ -64,6 +76,7 @@ public class ServiceMovimento extends Service {
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         refreshDeviceList();
         Log.e("testService", "IBINDER");
+
         return null;
     }
 
@@ -71,6 +84,7 @@ public class ServiceMovimento extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             Bundle b = intent.getExtras();
+
 
             String checkFirst = b.getString("gAitano");
             if (checkFirst.equals("init")) {
@@ -126,24 +140,47 @@ public class ServiceMovimento extends Service {
         super.onDestroy();
     }
 
-//    class IncomingHandler extends Handler {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            //obtain Activity address from Message
-//            Messenger mClient=msg.replyTo;
-//            try {
-//                // try to send it some mValue
-//                mClient.send(Message.obtain(null,MSG_SET_VALUE, mValue, 0));
-//            } catch (RemoteException e) {
-//                // The client is dead.  Remove it
-//                mClient=null;
-//            }
-//        }
-//    }
+    class IncomingHandler extends Handler { // Handler of incoming messages from clients.
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClients.add(msg.replyTo);
+                    break;
+                case MSG_UNREGISTER_CLIENT:
+                    mClients.remove(msg.replyTo);
+                    break;
+                case MSG_SET_INT_VALUE:
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+    private void sendMessageToUI(int intvaluetosend) {
+        for (int i=mClients.size()-1; i>=0; i--) {
+            try {
+                // Send data as an Integer
+                mClients.get(i).send(Message.obtain(null, MSG_SET_INT_VALUE, intvaluetosend, 0));
 
-    /**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-//    final Messenger mMessenger = new Messenger(new IncomingHandler());
+                //Send data as a String
+                Bundle b = new Bundle();
+                b.putString("str1", "ab" + intvaluetosend + "cd");
+                Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
+                msg.setData(b);
+                mClients.get(i).send(msg);
+
+            }
+            catch (RemoteException e) {
+                // The client is dead. Remove it from the list; we are going through the list from back to front so this is safe to do inside the loop.
+                mClients.remove(i);
+            }
+        }
+    }
+
+    public static boolean isRunning()
+    {
+        return isRunning;
+    }
 
 }
