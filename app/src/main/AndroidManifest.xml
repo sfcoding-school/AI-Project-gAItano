@@ -41,7 +41,7 @@
         </activity>
         <activity
             android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden"
-            android:name="ulisse.gAitano.MarkerDetector"
+            android:name=".MarkerDetectorActivity"
             android:label="@string/title_activity_marker" >
         </activity>
         <activity

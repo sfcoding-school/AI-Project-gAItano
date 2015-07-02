@@ -41,7 +41,7 @@ import ulisse.gAitano.MovementLibrary.Movement;
 import static org.opencv.highgui.Highgui.imread;
 
 
-public class MarkerDetector extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MarkerDetectorActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
 
     private List<Marker> MarkerTrovati;
@@ -177,7 +177,7 @@ public class MarkerDetector extends Activity implements CameraBridgeViewBase.CvC
     }
 
     static void show(Context context) {
-        final Intent intent = new Intent(context, MarkerDetector.class);
+        final Intent intent = new Intent(context, MarkerDetectorActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         context.startActivity(intent);
     }

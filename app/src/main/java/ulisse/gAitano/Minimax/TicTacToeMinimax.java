@@ -20,6 +20,10 @@ class Point {
     }
 }
 
+/*
+Scacchiera di gioco, si crea una matrice di 9 punti e una lista di posizioni ancora
+buone da giocare
+ */
 class Board {
 
     List<Point> availablePoints;
@@ -28,11 +32,12 @@ class Board {
     public Board() {
     }
 
+    //Partita Finita!!! Qualcuno ha vinto o la scacchiera è piena
     public boolean isGameOver() {
-        //Game is over is someone has won, or board is full (draw)
         return (hasXWon() || hasOWon() || getAvailableStates().isEmpty());
     }
 
+    //Controllo se il computer ha vinto
     public boolean hasXWon() {
         if ((board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] == 1) || (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] == 1)) {
           return true;
@@ -46,6 +51,7 @@ class Board {
         return false;
     }
 
+    //Controllo se l'user ha vinto
     public boolean hasOWon() {
         if ((board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] == 2) || (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] == 2)) {
            return true;
@@ -56,7 +62,6 @@ class Board {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -73,7 +78,7 @@ class Board {
     }
 
     public void placeAMove(Point point, int player) {
-        board[point.x][point.y] = player;   //player = 1 for X, 2 for O
+        board[point.x][point.y] = player;   //player: 1 per X, 2 per O
     }
 
     Point computersMove;
@@ -115,7 +120,7 @@ class Board {
                     break;
                 }
             }
-            board[point.x][point.y] = 0; //Reset this point
+            board[point.x][point.y] = 0;
         }
         return turn == 1 ? max : min;
     }

@@ -1,13 +1,10 @@
 package ulisse.gAitano;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.hardware.usb.UsbManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,17 +13,10 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import ulisse.gAitano.Utility.ServiceMovimento;
 
@@ -144,7 +134,7 @@ public class MainActivity extends Activity {
 
     private void showTicTacToe() {
         //if (port != null)
-        MarkerDetector.show(this);
+        MarkerDetectorActivity.show(this);
         //test2.show(this, port);
     }
 
