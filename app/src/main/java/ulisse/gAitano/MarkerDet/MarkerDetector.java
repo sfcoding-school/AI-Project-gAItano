@@ -18,17 +18,14 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-// TODO eliminate innecessary native calls, for example store the frame info
 // such as type in member fields and call it only once
 public class MarkerDetector {
     public enum thresSuppMethod {FIXED_THRES,ADPT_THRES,CANNY};
 
-    // TODO are these really fields??
     private double thresParam1, thresParam2;
     public thresSuppMethod thresMethod;
     private Mat grey, thres, thres2, hierarchy2;
     private List<MatOfPoint> contours2;
-    private MatOfPoint mIntermediateMat;
 
     private final static double MIN_DISTANCE = 10;
 
@@ -40,7 +37,6 @@ public class MarkerDetector {
         thres2 = new Mat();
         hierarchy2 = new Mat();
         contours2 = new ArrayList<>();
-        mIntermediateMat = new MatOfPoint();
     }
 
     /**
@@ -241,8 +237,7 @@ public class MarkerDetector {
      * they will be returned as a 2 items double array.
      */
     public double[] getThresholdParams(){
-        double[] ret = {thresParam1,thresParam2};
-        return ret;
+        return new double[]{thresParam1, thresParam2};
     }
 
     /**
