@@ -17,11 +17,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 
-/**
- * Marker detected in an image, it must be a four-squared contour with black border and
- * a valid code inside it.
- *
- */
+
 public class Marker extends Vector<Point> implements Comparable<Marker>{
 
 
@@ -31,16 +27,16 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
     protected float ssize;
     private int rotations;
 
-    public Code code; // a matrix of integer representing the code (see the class to further explanation)
+    public Code code;
 
-    private Mat mat; // the cvMat of the CANONICAL marker (not the one taken from the capture)
+    private Mat mat;
     private Mat Rvec;
     private Mat Tvec;
 
     public Marker(float size){
         id = -1;
         ssize = size;
-        // TODO revise how the mats are initialized, better to create them with the proper type
+
         // code more legible
         code = new Code();
         Rvec = new Mat(3,1,CvType.CV_64FC1);
@@ -52,7 +48,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         if (size()!=4)
             return;
 
-        // TODO loop¿?
+
         for(int i=0;i<4;i++)
             Core.line(in, this.get(i), this.get((i+1)%4), color, lineWidth);
         if(writeId){
@@ -84,11 +80,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         return cent;
     }
 
-    /**
-     * returns the perimeter of the marker, the addition of the distances between
-     * consecutive points.
-     * @return the perimeter.
-     */
+
     public double perimeter(){
         double sum=0;
         for(int i=0;i<size();i++){
@@ -100,10 +92,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         return sum;
     }
 
-    /**
-     * method to access the id, this only returns the id. Doesn't calculate it.
-     * @return the marker id.
-     */
+
     public int getMarkerId(){
         return id;
     }
@@ -135,9 +124,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         in.copyTo(mat);
     }
 
-    /**
-     * construct the matrix of integers from the mat stored.
-     */
+
     protected void extractCode(){
         int rows = mat.rows();
         int cols = mat.cols();
@@ -167,13 +154,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         }
     }
 
-    /**
-     * Return the id read in the code inside a marker. Each marker is divided into 7x7 regions
-     * of which the inner 5x5 contain info, the border should always be black. This function
-     * assumes that the code has been extracted previously.
-     * @param //in a marker
-     * @return the id of the marker
-     */
+
     protected int calculateMarkerId(){
         // check all the rotations of code
         Code[] rotations = new Code[4];
@@ -192,7 +173,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         }
         this.rotations = minDist[1]; //Log.e("Marker","" +minDist[0]);
         if(minDist[0] != 0){
-            return -1; // matching id not found
+            return -1; // matching  not found
         }
         else{
             this.id = 0;//mat2id(rotations[minDist[1]]);
@@ -201,15 +182,11 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         return id;
     }
 
-    /**
-     * this functions checks if the whole border of the marker is black
-     * @return true if the border is black, false otherwise
-     */
+    //controlla che il bordo sia effettivamente nero
     protected boolean checkBorder(){
         for(int i=0;i<7;i++){
-            // normally we'll only check first and last square
             int inc = 6;
-            if(i==0 || i==6)// in first and last row the whole row must be checked
+            if(i==0 || i==6)
                 inc = 1;
             for(int j=0;j<7;j+=inc)
                 if(code.get(i, j)==1)

@@ -18,7 +18,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-// such as type in member fields and call it only once
+
 public class MarkerDetector {
     public enum thresSuppMethod {FIXED_THRES,ADPT_THRES,CANNY};
 

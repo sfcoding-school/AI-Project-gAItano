@@ -5,7 +5,6 @@ package ulisse.gAitano.MarkerDet;
  */
 public class Code {// TODO check if the parameters are in range
     protected int[][] code;
-    protected String commandCode;
 
     protected Code(){
         code = new int[7][7];
