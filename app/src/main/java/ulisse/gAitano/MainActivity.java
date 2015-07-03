@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 
 
         button_movement.setEnabled(false);
-        button_TicTacToe.setEnabled(false);
+        button_TicTacToe.setEnabled(true);
         button_QR.setEnabled(false);
 
 
