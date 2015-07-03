@@ -36,19 +36,15 @@ public class ServiceMovimento extends Service {
 
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
     private static boolean isRunning = false;
-    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+    ArrayList<Messenger> mClients = new ArrayList<>();
 
     public void onCreate() {
         super.onCreate();
         isRunning = true;
-
     }
 
 
     private void refreshDeviceList() {
-
-
-
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
             @Override
             protected List<UsbSerialPort> doInBackground(Void... params) {
@@ -60,7 +56,6 @@ public class ServiceMovimento extends Service {
                 mEntries.clear();
                 mEntries.addAll(result);
                 if (mEntries.size() > 0) {
-
                     sendMessageToUI(1);
                     Toast.makeText(getApplicationContext(), "ho trovato una porta",
                             Toast.LENGTH_SHORT).show();
