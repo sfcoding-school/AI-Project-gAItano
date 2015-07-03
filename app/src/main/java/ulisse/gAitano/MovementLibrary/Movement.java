@@ -37,7 +37,7 @@ public class Movement extends MovementHex {
         context = context_temp;
     }
 
-    public void init_connection(/*SerialInputOutputManager.Listener mListener*/) {
+    public void init_connection() {
         if (sPort == null) {
             Log.e(TAG, "init_connection: sPort is Null");
         } else {
