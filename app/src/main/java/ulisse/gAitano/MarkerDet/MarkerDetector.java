@@ -53,43 +53,37 @@ public class MarkerDetector {
         Vector<Marker> candidateMarkers = new Vector<Marker>();
         detectedMarkers.clear();
 
-        // do the threshold of image and detect contours
+
         Imgproc.cvtColor(in, grey, Imgproc.COLOR_RGB2GRAY);
         thresHold(thresMethod, grey, thres);
         grey = in;
-        // pass a copy because it modifies the src image
+
         thres.copyTo(thres2);
-        //Imgproc.Canny(in, mIntermediateMat, 80, 100);
-        //Imgproc.findContours(mIntermediateMat, contours2, hierarchy2, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         Imgproc.findContours(thres2, contours2, hierarchy2, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
         Imgproc.drawContours(frameDebug, contours2, -1, new Scalar(255, 0, 0), 2);
-        // to each contour analyze if it is a paralelepiped likely to be a marker
+
         MatOfPoint2f approxCurve = new MatOfPoint2f();
         List<Point> approxPoints = new ArrayList<Point>();
         for(int i=0;i<contours2.size();i++){
             MatOfPoint contourMat = contours2.get(i);
-            // first check if it has enough points
+            // per prima cosa controlla se ha un numero sufficiente di punti
             int contourSize = (int)contourMat.total();
             if(contourSize > in.cols()/5){
-                //if(Imgproc.isContourConvex(contourMat)){
-                    MatOfPoint2f contour = new MatOfPoint2f(contourMat.toArray());
+                MatOfPoint2f contour = new MatOfPoint2f(contourMat.toArray());
                 Imgproc.approxPolyDP(contour, approxCurve, contourSize*0.05, true);
                 Converters.Mat_to_vector_Point(approxCurve, approxPoints);
-                // check the polygon has 4 points
                 if(approxCurve.total()== 4){
-                    // and if it is convex
 
-                        // ensure the distance between consecutive points is large enough
+                        //controlla che la distanza tra i punti sia abbastanza
                         double minDistFound = Double.MAX_VALUE;
                         int[] points = new int[8];// [x1 y1 x2 y2 x3 y3 x4 y4]
-                        //approxCurve.get(0,0,points);
                     int boh = 0;
                     for (int r=0;r<8;r+=2) {
                         points[r] = (int) approxPoints.get(boh).x;
                         points[r+1] = (int) approxPoints.get(boh).y;
                         boh++;
                     }
-                        // look for the min distance
+                        //controlla la distanza
                         for(int j=0;j<=4;j+=2){
                             double d = Math.sqrt( (points[j]-points[(j+2)%4])*(points[j]-points[(j+2)%4]) +
                                     (points[j+1]-points[(j+3)%4])*(points[j+1]-points[(j+3)%4]));
@@ -97,7 +91,7 @@ public class MarkerDetector {
                                 minDistFound = d;
                         }
                         if(minDistFound > MIN_DISTANCE){
-                            // create a candidate marker
+                            //crea il marker candidato
                             candidateMarkers.add(new Marker(markerSizeMeters));
                             candidateMarkers.lastElement().add(new Point(points[0],points[1]));
                             candidateMarkers.lastElement().add(new Point(points[2],points[3]));
@@ -107,32 +101,33 @@ public class MarkerDetector {
                     }
                 //}
             }
-        }// all contours processed, now we have the candidateMarkers
+        }
         int nCandidates = candidateMarkers.size();
-        // sort the points in anti-clockwise order
+        //ordina i punti in senso anti orario
         for(int i=0;i<nCandidates;i++){
-            // trace a line between the first and second point.
-            // if the third point is at the right side, then the points are anti-clockwise
+            // tracciando una linea tra il primo e il secondo punto
+            // se il terzo è dal lato destro allora i punti sono disposti in senso anti-orario
             Marker marker = candidateMarkers.get(i);
             double dx1 = marker.get(1).x - marker.get(0).x;
             double dy1 = marker.get(1).y - marker.get(0).y;
             double dx2 = marker.get(2).x - marker.get(0).x;
             double dy2 = marker.get(2).y - marker.get(0).y;
             double o = dx1*dy2 - dy1*dx2;
-            if(o < 0.0) // the third point is in the left side, we have to swap
+            if(o < 0.0) //il terzo punto è a sinistra: eseguiamo lo swap tra 1 e 3
                 Collections.swap(marker, 1, 3);
-        }// points sorted in anti-clockwise order
+        }
 
-        // remove the elements whose corners are to close to each other // TODO test without this and see what happens
-        Vector<Integer> tooNearCandidates = new Vector<Integer>(); // stores the indexes in the candidateMarkers
-        // i.e [2,3,4,5] the marker 2 is too close to 3 and 4 to 5
+        //TODO costoso! testare i risultati eliminando questo controllo.
+        //rimuovo i marker candidati i cui angoli sono troppo vicini tra loro
+        Vector<Integer> tooNearCandidates = new Vector<Integer>();
+
         for(int i=0;i<nCandidates;i++){
             Marker toMarker = candidateMarkers.get(i);
-            // calculate the average distance of each corner to the nearest corner in the other marker
+            // calocolo la distanza tra ogni angolo di un marker e gli angoli di tutti gli altri.
             for(int j=i+1;j<nCandidates;j++){
                 float dist=0;
                 Marker fromMarker = candidateMarkers.get(j);
-                // unrolling loop
+
                 dist+=Math.sqrt((fromMarker.get(0).x-toMarker.get(0).x)*(fromMarker.get(0).x-toMarker.get(0).x)+
                         (fromMarker.get(0).y-toMarker.get(0).y)*(fromMarker.get(0).y-toMarker.get(0).y));
 
@@ -154,7 +149,7 @@ public class MarkerDetector {
         Vector<Integer> toRemove = new Vector<Integer>();// 1 means to remove
         for(int i=0;i<nCandidates;i++)
             toRemove.add(0);
-        // set to remove the marker with the smaller perimeter
+        // elimino i marker con il perimetro minore
         for(int i=0;i<tooNearCandidates.size();i+=2){
             Marker first = candidateMarkers.get(tooNearCandidates.get(i));
             Marker second = candidateMarkers.get(tooNearCandidates.get(i+1));
@@ -164,7 +159,7 @@ public class MarkerDetector {
                 toRemove.set(tooNearCandidates.get(i+1), 1);
         }
 
-        // identify the markers
+        // identifico i marker
         for(int i=0;i<nCandidates;i++){
             if(toRemove.get(i) == 0){
                 Marker marker = candidateMarkers.get(i);
@@ -188,15 +183,16 @@ public class MarkerDetector {
                     if(id ==0){
                         detectedMarkers.add(marker);
                         Log.e("Marker", "detectedMarkers" + detectedMarkers.size());
-                        // rotate the points of the marker so they are always in the same order no matter the camera orientation
+                        // ruotiamo i marker in modo da averli sempre nello stesso verso a prescindere dalla rotazione della camera
                         Collections.rotate(marker, 4-marker.getRotations());
                     }
                 }
             }
         }
-        // TODO refine using pixel accuracy
+        // TODO si potrebbe raffinare utilizzando la pixel accuracy
+
+        // ordiniamo tramite l'id e controlliamo che ogni marker sia trovato una sola volta
         /*
-        // now sort by id and check that each marker is only detected once
         Collections.sort(detectedMarkers);
         toRemove.clear();
         for(int i=0;i<detectedMarkers.size();i++)
@@ -221,42 +217,7 @@ public class MarkerDetector {
         */
     }
 
-    /**
-     * Set the parameters of the threshold method
-     * We are currently using the Adptive threshold ee opencv doc of adaptiveThreshold for more info
-     * @param //param1: blockSize of the pixel neighborhood that is used to calculate a threshold value for the pixel
-     * @param //param2: The constant subtracted from the mean or weighted mean
-     */
-    public void setThresholdParams(double p1, double p2){
-        thresParam1=p1;
-        thresParam2=p2;
-    }
 
-    /**
-     * Get the parameters of the threshold method
-     * they will be returned as a 2 items double array.
-     */
-    public double[] getThresholdParams(){
-        return new double[]{thresParam1, thresParam2};
-    }
-
-    /**
-     * sets the method to be used in the threshold necessary to the marker detection.
-     * @param method must be a supported method.
-     */
-    public void setThresholdMethod(thresSuppMethod method){
-        thresMethod = method;
-    }
-
-    /**
-     * returns the method being used to threshold the image.
-     * @return the method used.
-     */
-    public thresSuppMethod getThresholdMethod(){
-        return thresMethod;
-    }
-
-    // TODO revise this code
     public void thresHold(thresSuppMethod method, Mat src, Mat dst){
         switch(method){
             case FIXED_THRES:
@@ -267,19 +228,12 @@ public class MarkerDetector {
                         Imgproc.THRESH_BINARY_INV,(int)thresParam1,thresParam2);
                 break;
             case CANNY:
-                Imgproc.Canny(src, dst, 10, 220);// TODO this parameters??
+                Imgproc.Canny(src, dst, 10, 220);
                 break;
         }
     }
 
-    /**
-     * This fits a mat containing 4 vertices captured through the camera
-     * into a canonical mat.
-     * @param in the frame captured
-     * @param out the canonical mat
-     * @param size the size of the canonical mat we want to create
-     * @param points the coordinates of the points in the "in" mat
-     */
+
     private void warp(Mat in, Mat out, Size size, Vector<Point> points){
         Mat pointsIn = new Mat(4,1,CvType.CV_32FC2);
         Mat pointsRes = new Mat(4,1,CvType.CV_32FC2);

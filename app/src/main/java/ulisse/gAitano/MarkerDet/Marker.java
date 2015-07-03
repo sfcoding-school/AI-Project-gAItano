@@ -218,36 +218,12 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         return true;
     }
 
-    /**
-     * Calculate 3D position of the marker based on its translation and rotation matrix.
-     * This method fills in these matrix properly.
-     * @param camMatrix
-     * @param //distCoeff
-     */
-    protected void calculateExtrinsics(Mat camMatrix, Mat distCoeffs, float sizeMeters){// TODO size neccesary?
-        // TODO check params
-
-        // set the obj 3D points
-        double halfSize = sizeMeters/2.0;
-        List<Point3> objPoints = new ArrayList<Point3>();
-        objPoints.add(new Point3(-halfSize, -halfSize,0));
-        objPoints.add(new Point3(-halfSize,  halfSize,0));
-        objPoints.add(new Point3( halfSize,  halfSize,0));
-        objPoints.add(new Point3( halfSize, -halfSize,0));
-
-
-//              rotateXAxis(Rvec);// TODO necesario??
-    }
-
     private int hammDist(Code code){
         int ids[][] = {
-                //{1,1,1,1,1},
-                //{1,0,1,1,1}
-//                {1,1,0,0,1},
-//                {1,1,0,1,1},
-//                {1,1,1,1,1}
-              // {1,0,0,0,1},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,1}
-                {1,1,1,1,1},{1,0,0,0,1},{1,0,0,0,1},{1,0,0,0,1},{1,1,1,1,1}
+              {1,1,1,1,1},{1,0,0,0,1},{1,0,0,0,1},{1,0,0,0,1},{1,1,1,1,1} //marker quadrato
+                //{1,0,1,1,1},{1,1,1,1,0},{1,1,1,0,1},{1,0,0,0,0},{0,0,0,0,0} //marker 2
+                //0000000-0000000-0010000-0001100-0001000-0000000-0000000-
+
         };
         int dist = 0;
 
@@ -263,7 +239,7 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
 //                    teest += ids[p][x];
 //                    teest2 += code.get(y + 1, x + 1);
 //                }
-//                Log.e("Marker", teest  + " " + teest2);
+//                //Log.e("Marker", teest  + " " + teest2);
 //                minSum = sum<minSum? sum:minSum;
 //
 //            }
@@ -271,29 +247,16 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
 //        }
 
         for(int y=0;y<5;y++){
-
-                for(int x=0;x<5;x++)
-                    if (code.get(y+1,x+1)!=ids[y][x]) {
-                        //Log.e("Marker", "Diverso ");
+                for(int x=0;x<5;x++) {
+                    if (code.get(y + 1, x + 1) != ids[y][x]) {
+                        Log.e("Marker", "code["+y +"]["+ x +"]=" + code.get(y + 1, x + 1) +"!=" + ids[y][x]);
+                        Log.e("Marker", "Diverso ");
                         return -1;
                     }
+                }
         }
-        //Log.e("Marker", "Uguale");
-        return 0;
-//        for(int y=0;y<5;y++){
-//            int minSum = 0;
-//            for(int p=0;p<4;p++){
-//                int sum=0;
-//                for(int x=0;x<5;x++) {
-//                    minSum += code.get(y + 1, x + 1) == ids[p][x] ? 0 : 1;
-//                }
-//                //Log.e("Marker", teest  + " " + teest2);
-//                //minSum = sum<minSum? sum:minSum;
-//
-//            }
-//            dist+=minSum;
-//        }
-        //return dist;
+        Log.e("Marker", "Uguale");
+        return dist;
     }
 
     private int mat2id(Code code){

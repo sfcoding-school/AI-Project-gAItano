@@ -37,6 +37,7 @@ import ulisse.gAitano.MarkerDet.CameraParameters;
 import ulisse.gAitano.MarkerDet.Code;
 import ulisse.gAitano.MarkerDet.Marker;
 import ulisse.gAitano.MovementLibrary.Movement;
+import ulisse.gAitano.Utility.ServiceMovimento;
 
 import static org.opencv.highgui.Highgui.imread;
 
@@ -45,17 +46,12 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
 
 
     private List<Marker> MarkerTrovati;
-    private Mat mIntermediateMat;
     private Mat mGray;
     private Mat frameCapture;
     Mat hierarchy;
     List<MatOfPoint> contours;
-    //List<Marker> MarkerList;
-    List<Point> m_markerCorner;
     Button button;
     ImageView test;
-    Code code;
-    MatOfPoint mat;
     double COL;
     double ROW;
 
@@ -136,26 +132,17 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
         CameraParameters mCamParam = new CameraParameters();
         float markerSizeMeters = 0.034f;
 
-        Vector<Marker> MarkerDetected= new Vector<Marker>();
+        Vector<Marker> MarkerDetected= new Vector<>();
 
         A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
 
-       /* if (MarkerDetected.size() != 0 ){
-            Point p1 = MarkerDetected.get(0).findCenter();
-            MarkerTrovati.add(MarkerDetected.get(0));
-            Log.e("Data", " Marker = " + p1.x + "," + p1.y + "dim = " + ROW/2 + " " + COL/2);
-
-            //Core.line(frameCapture,p1,new Point(rows,cols/2),new Scalar(255,255,0),10);
-            Core.line(frameCapture,p1,new Point(ROW/2,COL/2),new Scalar(255,255,0),10);
-            stampa();
-
-        }*/
-
         if (MarkerDetected.size() != 0 ){
             Log.e("Marker", "Sono esattamente:" + MarkerDetected.size());
-            for (int i=0; i<MarkerDetected.size(); i++)
-                if (MarkerTrovati.size()==0 || !near(MarkerTrovati.get(0).findCenter(),MarkerDetected.get(i).findCenter()))
+            for (int i=0; i<MarkerDetected.size(); i++) {
+                if (MarkerTrovati.size() == 0 || !near(MarkerTrovati.get(0).findCenter(), MarkerDetected.get(i).findCenter()))
                     MarkerTrovati.add(MarkerDetected.get(i));
+
+            }
         }else{
             Log.e("Marker","Nun ce sò");
         }
@@ -184,7 +171,6 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
         mGray = new Mat(height, width, CvType.CV_8UC1);
         frameCapture = new Mat(height, width, CvType.CV_8UC1);
         hierarchy = new Mat();
@@ -198,11 +184,6 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        //Nuova
-        //Imgproc.cvtColor(inputFrame.rgba(),mGray,Imgproc.COLOR_RGB2GRAY);
-        //Imgproc.adaptiveThreshold(mGray,mGray,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,7,7);
-
-        contours = new ArrayList<MatOfPoint>();
         hierarchy = new Mat();
 
 
@@ -213,7 +194,6 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
 
         //Core.line(frameCapture,new Point(0,0),new Point(ROW/2,COL/2),new Scalar(255,255,0),10);
 
-
         return frameCapture;
     }
 
@@ -222,6 +202,7 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
         Log.e("Marker", " " + MarkerTrovati.size());
         for (int i=0; i<MarkerTrovati.size(); i++){
             MarkerTrovati.get(i).draw(frameCapture,new Scalar(255,0,0),10,true);
+            executeCommand(MarkerTrovati);
         }
 
         Bitmap bm = Bitmap.createBitmap(frameCapture.cols(), frameCapture.rows(), Bitmap.Config.ARGB_8888);
@@ -232,7 +213,7 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
 
     private boolean near(Point p1, Point p2){
         boolean ris= false;
-        float dis = euqlDist(p1,p2);
+        float dis = euqlDist(p1, p2);
         if (dis <= 20){
             ris = true;
         }else {
@@ -241,19 +222,25 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
         return ris;
     }
 
-    private Point subsractPoint(Point v1, Point v2){
-        double v1x = v1.x - v2.x;
-        double v1y = v1.y - v2.y;
-        return new Point(v1x, v1y);
-
-    }
 
     private float euqlDist(Point a, Point b){
-        double res = Math.sqrt(Math.pow((a.x - b.x),2) + Math.pow((a.y - b.y),2));
+        double res = Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
         return (float) res;
     }
 
+    private void executeCommand(List<Marker> m ){
+        Intent intent=new Intent(this,ServiceMovimento.class);
+        Bundle b=new Bundle();
+        b.putString("gAitano", "QRProject");
+        for (int i=0; i<m.size();i++){
+            if (m.get(i).getMarkerId()==0) {
+                b.putString("QR", "wakeUP");
+                intent.putExtras(b);
+                startService(intent);
+            }
+        }
 
+    }
 
 }
 
