@@ -36,9 +36,7 @@ public class GiocaActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gioca_tris);
-
         initLayout();
-
     }
 
     private void init_game(){
