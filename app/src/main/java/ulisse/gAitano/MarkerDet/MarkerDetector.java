@@ -39,15 +39,7 @@ public class MarkerDetector {
         contours2 = new ArrayList<>();
     }
 
-    /**
-     * Method to find markers in a Mat given.
-     * @param in input color Mat to find the markers in.
-     * @param detectedMarkers output vector with the markers that have been detected.
-     * @param camMatrix --
-     * @param distCoeff --
-     * @param markerSizeMeters --
-     * @param frameDebug used for debug issues, delete this
-     */
+
     public void detect(Mat in, Vector<Marker> detectedMarkers, Mat camMatrix, Mat distCoeff,
                        float markerSizeMeters, Mat frameDebug){
         Vector<Marker> candidateMarkers = new Vector<Marker>();
@@ -168,6 +160,7 @@ public class MarkerDetector {
                 marker.setMat(canonicalMarker);
                 marker.extractCode();
 
+                /*
                 String sum = "";
                 for (int x=0;x<7;x++){
                     for (int y=0;y<7;y++){
@@ -176,6 +169,7 @@ public class MarkerDetector {
                     sum = sum +"-";
                 }
                 Log.e("Marker", "= " + sum);
+                */
                 if(marker.checkBorder()){
                     //Log.e("Marker", "ok");
                     int id = marker.calculateMarkerId();

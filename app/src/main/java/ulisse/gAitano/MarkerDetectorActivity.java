@@ -49,7 +49,6 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
     private Mat mGray;
     private Mat frameCapture;
     Mat hierarchy;
-    List<MatOfPoint> contours;
     Button button;
     ImageView test;
     double COL;
@@ -63,7 +62,7 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
-                    Log.i("sono qui", "OpenCV loaded successfully");
+                    Log.i("sLog", "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                 }
                 break;
@@ -91,7 +90,6 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.i("PROVA tag 2", "called onCreate");
         super.onCreate(savedInstanceState);
 
         movementClass = new Movement(getApplicationContext(), sPort);
@@ -137,14 +135,14 @@ public class MarkerDetectorActivity extends Activity implements CameraBridgeView
         A.detect(frameCapture, MarkerDetected, mCamParam.getCameraMatrix(), mCamParam.getDistCoeff(), markerSizeMeters, mGray);
 
         if (MarkerDetected.size() != 0 ){
-            Log.e("Marker", "Sono esattamente:" + MarkerDetected.size());
+            Log.e("Marker", "Sono esattamente: " + MarkerDetected.size());
             for (int i=0; i<MarkerDetected.size(); i++) {
                 if (MarkerTrovati.size() == 0 || !near(MarkerTrovati.get(0).findCenter(), MarkerDetected.get(i).findCenter()))
                     MarkerTrovati.add(MarkerDetected.get(i));
 
             }
         }else{
-            Log.e("Marker","Nun ce sò");
+            Log.e("Marker","Non ci sono marker");
         }
     }
 

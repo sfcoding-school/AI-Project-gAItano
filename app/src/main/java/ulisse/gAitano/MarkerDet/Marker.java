@@ -37,7 +37,6 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         id = -1;
         ssize = size;
 
-        // code more legible
         code = new Code();
         Rvec = new Mat(3,1,CvType.CV_64FC1);
         Tvec = new Mat(3,1,CvType.CV_64FC1);
@@ -226,8 +225,6 @@ public class Marker extends Vector<Point> implements Comparable<Marker>{
         for(int y=0;y<5;y++){
                 for(int x=0;x<5;x++) {
                     if (code.get(y + 1, x + 1) != ids[y][x]) {
-                        Log.e("Marker", "code["+y +"]["+ x +"]=" + code.get(y + 1, x + 1) +"!=" + ids[y][x]);
-                        Log.e("Marker", "Diverso ");
                         return -1;
                     }
                 }
