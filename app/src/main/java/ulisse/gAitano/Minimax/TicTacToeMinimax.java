@@ -139,7 +139,7 @@ public class TicTacToeMinimax {
     }
 
     public static int[] computerMove() {
-        b.minimax(0, 1);
+        b.minimax(0, 1); // 0: profondità da cui partire, 1: il giocatore uno (computer)
         b.placeAMove(b.computersMove, 1);
         return new int[]{b.computersMove.x, b.computersMove.y};
     }
