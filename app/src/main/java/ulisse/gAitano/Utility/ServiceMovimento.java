@@ -147,14 +147,14 @@ public class ServiceMovimento extends Service {
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClients.add(msg.replyTo);
-                    Log.e("Messaggio Servizio S", "handleMessage 1");
+                    //Log.e("Messaggio Servizio S", "handleMessage 1");
                     break;
                 case MSG_UNREGISTER_CLIENT:
                     mClients.remove(msg.replyTo);
-                    Log.e("Messaggio Servizio S", "handleMessage 2");
+                    //Log.e("Messaggio Servizio S", "handleMessage 2");
                     break;
                 case MSG_SET_INT_VALUE:
-                    Log.e("Messaggio Servizio S", "handleMessage 3");
+                    //Log.e("Messaggio Servizio S", "handleMessage 3");
                     mClients.add(msg.replyTo);
                     break;
                 default:
