@@ -12,11 +12,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import ulisse.gAitano.Utility.ServiceMovimento;
 
@@ -27,6 +25,9 @@ public class MainActivity extends Activity {
     Button button_TicTacToe;
     Button button_gioca;
     Button button_QR;
+    Messenger mService = null;
+    boolean mIsBound;
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +36,6 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         initLayout();
-
-
 
         Intent intent = new Intent(this,ServiceMovimento.class);
 
@@ -48,12 +47,10 @@ public class MainActivity extends Activity {
         startService(intent);
 
         CheckIfServiceIsRunning();
-
     }
     @Override
     protected void onStart(){
         super.onStart();
-
     }
 
 
@@ -62,8 +59,6 @@ public class MainActivity extends Activity {
         button_TicTacToe = (Button) findViewById(R.id.b_project);
         button_gioca = (Button) findViewById(R.id.b_gioca);
         button_QR = (Button) findViewById(R.id.button22);
-
-
 
         button_gioca.setOnClickListener(new View.OnClickListener() {
 
@@ -96,23 +91,14 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-
                 showQRActivity();
-
 
             }
 
         });
-
-
         button_movement.setEnabled(false);
         button_TicTacToe.setEnabled(false);
         button_QR.setEnabled(false);
-
-
-
-
-
     }
 
 
@@ -134,13 +120,6 @@ public class MainActivity extends Activity {
         MarkerDetectorActivity.show(this);
     }
 
-
-
-    Messenger mService = null;
-    boolean mIsBound;
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -156,8 +135,6 @@ public class MainActivity extends Activity {
             }
         }
     }
-
-
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
