@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId 'ulisse.gAitano'
-        minSdkVersion 18
+        minSdkVersion 17
         versionCode 1
         versionName "1.0"
     }
