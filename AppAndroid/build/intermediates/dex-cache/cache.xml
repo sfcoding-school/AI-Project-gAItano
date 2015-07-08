@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/ulisse/Documenti/gAitano/app/build/intermediates/exploded-aar/gAitano/openCVLibrary249/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="83bb8cc663a0f6f9e93cafa5593d869a0013c08d">
+        <dex dex="/home/ulisse/Documenti/gAitano/app/build/intermediates/pre-dexed/debug/classes-9a4b90d319e6eabda36c922ee99b631f71e581b5.jar" />
+    </item>
+    <item
+        jar="/home/ulisse/Documenti/gAitano/app/build/intermediates/exploded-aar/com.hoho.android/usbSerialForAndroid/0.2.0-SNAPSHOT/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="81f35a7ecb1a0a8489f95f8e49c8ec4e9763091b">
+        <dex dex="/home/ulisse/Documenti/gAitano/app/build/intermediates/pre-dexed/debug/classes-19894c85085e65dd3b56d73cc8d1a30dc732eaca.jar" />
+    </item>
+
+</items>
